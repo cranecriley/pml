@@ -4,7 +4,9 @@ globs: /tasks/prd-*.md
 ---
 # Rule: Generating a Product Requirements Document (PRD)
 
-## Goal  To guide an AI assistant in creating a detailed Product Requirements Document (PRD) in Markdown format, based on an initial user prompt. The PRD should be clear, actionable, and suitable for a junior developer to understand and implement the feature.
+## Goal
+
+To guide an AI assistant in creating a detailed Product Requirements Document (PRD) in Markdown format, based on an initial user prompt. The PRD should be clear, actionable, and suitable for a junior developer to understand and implement the feature.
 
 ## Process
 
@@ -15,7 +17,9 @@ globs: /tasks/prd-*.md
 
 ## Clarifying Questions Format
 
-When asking clarifying questions, the AI *must* format them as a numbered list. This list should support nested sub-questions using dot notation (e.g. 1, 2, 2.1, 2.2, 3).  Example format:
+When asking clarifying questions, the AI *must* format them as a numbered list. This list should support nested sub-questions using dot notation (e.g. 1, 2, 2.1, 2.2, 3).
+
+Example format:
 
 1. Top-level question 1?
 2. Top-level question 2?
@@ -25,7 +29,7 @@ When asking clarifying questions, the AI *must* format them as a numbered list. 
 
 There should only be one atomic question per list item.
 
-The AI should adapt its *actual questions* based on the user’s initial prompt, aiming to cover relevant areas like: 
+The AI should adapt its *actual questions* based on the user’s initial prompt, aiming to cover relevant areas like:
 - **Problem/Goal:** What problem does this feature solve? What is the primary goal?
 - **Target User:** Who is this feature for?
 - **Core Functionality:** What are the essential actions the user must be able to perform?
@@ -34,10 +38,11 @@ The AI should adapt its *actual questions* based on the user’s initial prompt,
 - **Scope/Boundaries:** What should this feature explicitly *not* do?
 - **Data:** What information needs to be displayed or managed?
 - **Design/UI:** Are there mockups or specific UI preferences?
-- **Edge Cases:** What potential errors or unusual situations should be considered? 
+- **Edge Cases:** What potential errors or unusual situations should be considered?
+
 ## PRD Structure
 
-The generated PRD should include the following sections: 
+The generated PRD should include the following sections:
 1. **Introduction/Overview:** Briefly describe the feature and the problem it solves. State the goal.
 2. **Goals:** List the specific, measurable objectives for this feature.
 3. **User Stories:** Detail the user narratives describing feature usage and benefits.
@@ -50,7 +55,9 @@ The generated PRD should include the following sections: 
 
 ## Target Audience
 
-Assume the primary reader of the PRD is a **junior developer**. Therefore, requirements should be explicit, unambiguous, and avoid jargon where possible. Provide enough detail for them to understand the feature’s purpose and core logic.  ## Output
+Assume the primary reader of the PRD is a **junior developer**. Therefore, requirements should be explicit, unambiguous, and avoid jargon where possible. Provide enough detail for them to understand the feature’s purpose and core logic.
+
+## Output
 
 - **Format:** Markdown (‘.md’)
 - **Location:** ‘/tasks/‘
