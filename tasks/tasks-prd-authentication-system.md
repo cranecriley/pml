@@ -24,8 +24,8 @@
 
 - [ ] 1.0 Set up Supabase Auth configuration and environment
     - [x] 1.1 Install Supabase client library and configure project credentials
-    - [ ] 1.2 Create Supabase client configuration file with auth settings
-    - [ ] 1.3 Set up environment variables for Supabase URL and anon key
+    - [x] 1.2 Create Supabase client configuration file with auth settings
+    - [x] 1.3 Set up environment variables for Supabase URL and anon key
     - [ ] 1.4 Configure Supabase Auth settings (session timeout, password requirements)
     - [ ] 1.5 Set up email templates for verification and password reset
 

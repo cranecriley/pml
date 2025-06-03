@@ -12,9 +12,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
   }
 })
+
+// Auth configuration constants
+export const AUTH_CONFIG = {
+  SESSION_TIMEOUT_HOURS: 24,
+  PASSWORD_MIN_LENGTH: 8,
+  MAX_LOGIN_ATTEMPTS: 5,
+  LOGIN_ATTEMPT_WINDOW_MINUTES: 15,
+  PASSWORD_RESET_LINK_EXPIRY_HOURS: 1,
+} as const
 
 // Auth helper functions
 export const auth = supabase.auth
