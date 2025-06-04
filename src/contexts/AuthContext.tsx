@@ -7,11 +7,13 @@ import { passwordResetService } from '../services/passwordResetService'
 import { passwordResetConfirmService } from '../services/passwordResetConfirmService'
 import { sessionService } from '../services/sessionService'
 import { inactivityService } from '../services/inactivityService'
+import { userProfileService, type PostLoginRouting } from '../services/userProfileService'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  postLoginRouting: PostLoginRouting | null
   inactivityWarning: {
     isVisible: boolean
     timeRemaining: number
@@ -25,6 +27,8 @@ interface AuthContextType {
   refreshSession: () => Promise<void>
   extendSession: () => void
   dismissInactivityWarning: () => void
+  completeOnboarding: () => Promise<void>
+  getPostLoginPath: () => string
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -45,11 +49,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [postLoginRouting, setPostLoginRouting] = useState<PostLoginRouting | null>(null)
   const [inactivityWarning, setInactivityWarning] = useState({
     isVisible: false,
     timeRemaining: 0
   })
   const cleanupRefs = useRef<(() => void)[]>([])
+
+  // Function to handle post-login routing determination
+  const determinePostLoginRouting = async (user: User) => {
+    try {
+      const routing = await userProfileService.checkUserStatus(user)
+      setPostLoginRouting(routing)
+      console.log('Post-login routing determined:', routing)
+      return routing
+    } catch (error) {
+      console.error('Failed to determine post-login routing:', error)
+      // Set default routing on error
+      const defaultRouting: PostLoginRouting = {
+        shouldGoToWelcome: false,
+        shouldGoToDashboard: true,
+        redirectPath: '/dashboard',
+        isNewUser: false,
+        isReturningUser: true
+      }
+      setPostLoginRouting(defaultRouting)
+      return defaultRouting
+    }
+  }
 
   useEffect(() => {
     // Session restoration and monitoring setup
@@ -58,15 +85,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Restore session on app load
         const restoreResult = await sessionService.restoreSession()
         
-        if (restoreResult.isValid && restoreResult.session) {
+        if (restoreResult.isValid && restoreResult.session && restoreResult.user) {
           setSession(restoreResult.session)
           setUser(restoreResult.user)
+          
+          // Determine post-login routing for restored session
+          await determinePostLoginRouting(restoreResult.user)
           
           // Start inactivity monitoring for authenticated users
           startInactivityMonitoring()
         } else {
           setSession(null)
           setUser(null)
+          setPostLoginRouting(null)
           if (restoreResult.error) {
             console.warn('Session restore failed:', restoreResult.error)
           }
@@ -75,6 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error('Auth initialization failed:', error)
         setSession(null)
         setUser(null)
+        setPostLoginRouting(null)
       } finally {
         setLoading(false)
       }
@@ -106,6 +138,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const handleInactivityLogout = async () => {
       try {
         setInactivityWarning({ isVisible: false, timeRemaining: 0 })
+        setPostLoginRouting(null)
         await signOut()
         // Could show a toast notification here about the automatic logout
       } catch (error) {
@@ -124,6 +157,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSession(session)
           setUser(session?.user ?? null)
           
+          // Determine routing for new sign-ins
+          if (session?.user && event === 'SIGNED_IN') {
+            await determinePostLoginRouting(session.user)
+          }
+          
           // Start inactivity monitoring when user signs in
           if (session?.user) {
             startInactivityMonitoring()
@@ -131,6 +169,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } else if (event === 'SIGNED_OUT') {
           setSession(null)
           setUser(null)
+          setPostLoginRouting(null)
           setInactivityWarning({ isVisible: false, timeRemaining: 0 })
           
           // Stop both session and inactivity monitoring when signed out
@@ -271,10 +310,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }))
   }
 
+  const completeOnboarding = async () => {
+    if (!user) {
+      throw new Error('No user logged in')
+    }
+
+    try {
+      await userProfileService.completeOnboarding(user.id)
+      
+      // Update routing to reflect completed onboarding
+      setPostLoginRouting({
+        shouldGoToWelcome: false,
+        shouldGoToDashboard: true,
+        redirectPath: '/dashboard',
+        isNewUser: false,
+        isReturningUser: true
+      })
+      
+      console.log('Onboarding completed successfully')
+    } catch (error) {
+      console.error('Failed to complete onboarding:', error)
+      throw error
+    }
+  }
+
+  const getPostLoginPath = (): string => {
+    return postLoginRouting?.redirectPath || '/dashboard'
+  }
+
   const value: AuthContextType = {
     user,
     session,
     loading,
+    postLoginRouting,
     inactivityWarning,
     signUp,
     signIn,
@@ -285,6 +353,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshSession,
     extendSession,
     dismissInactivityWarning,
+    completeOnboarding,
+    getPostLoginPath,
   }
 
   return (

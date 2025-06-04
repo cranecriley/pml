@@ -4,12 +4,14 @@ import { loginService } from '../services/loginService'
 import { sessionService } from '../services/sessionService'
 import { inactivityService } from '../services/inactivityService'
 import type { LoginCredentials, RegisterCredentials, PasswordResetRequest } from '../types/auth'
+import type { PostLoginRouting } from '../services/userProfileService'
 
 interface UseAuthReturn {
   // State
   user: any
   session: any
   loading: boolean
+  postLoginRouting: PostLoginRouting | null
   inactivityWarning: {
     isVisible: boolean
     timeRemaining: number
@@ -65,6 +67,8 @@ interface UseAuthReturn {
   extendSession: () => void
   dismissInactivityWarning: () => void
   getInactivityStatus: () => ReturnType<typeof inactivityService.getStatus>
+  completeOnboarding: () => Promise<void>
+  getPostLoginPath: () => string
 }
 
 export const useAuth = (): UseAuthReturn => {
@@ -72,6 +76,7 @@ export const useAuth = (): UseAuthReturn => {
     user, 
     session, 
     loading: contextLoading, 
+    postLoginRouting,
     inactivityWarning,
     signUp, 
     signOut, 
@@ -80,7 +85,9 @@ export const useAuth = (): UseAuthReturn => {
     confirmPasswordReset: confirmPasswordResetContext, 
     refreshSession: refreshSessionContext,
     extendSession: extendSessionContext,
-    dismissInactivityWarning: dismissInactivityWarningContext
+    dismissInactivityWarning: dismissInactivityWarningContext,
+    completeOnboarding: completeOnboardingContext,
+    getPostLoginPath: getPostLoginPathContext
   } = useAuthContext()
   
   // Individual loading states for each operation
@@ -292,10 +299,19 @@ export const useAuth = (): UseAuthReturn => {
     return inactivityService.getStatus()
   }
 
+  const completeOnboarding = async () => {
+    await completeOnboardingContext()
+  }
+
+  const getPostLoginPath = () => {
+    return getPostLoginPathContext()
+  }
+
   return {
     user,
     session,
     loading: contextLoading,
+    postLoginRouting,
     inactivityWarning,
     login,
     register,
@@ -309,6 +325,8 @@ export const useAuth = (): UseAuthReturn => {
     getSessionInfo,
     extendSession,
     dismissInactivityWarning,
-    getInactivityStatus
+    getInactivityStatus,
+    completeOnboarding,
+    getPostLoginPath
   }
 } 

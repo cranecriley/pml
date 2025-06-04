@@ -13,22 +13,23 @@
 - `src/components/auth/EmailConfirmation.tsx` - Email confirmation handler for verification redirect
 - `src/components/auth/InactivityWarning.tsx` - Modal warning component for inactivity timeout with session extension options
 - `src/components/auth/AuthWrapper.tsx` - Wrapper component that integrates inactivity warnings with the app
-- `src/pages/LoginPage.tsx` - Dedicated login page with proper routing, authentication checks, and navigation links
+- `src/pages/LoginPage.tsx` - Dedicated login page with proper routing, authentication checks, post-login routing logic, and navigation links
 - `src/pages/RegisterPage.tsx` - Dedicated registration page with success flow, email verification instructions, and navigation
 - `src/pages/PasswordResetPage.tsx` - Password reset request page with simplified flow and navigation links
-- `src/routes/index.tsx` - React Router configuration with authentication routes, protected routes, and email confirmation handling
+- `src/routes/index.tsx` - React Router configuration with authentication routes, protected routes, enhanced welcome page with onboarding completion, and email confirmation handling
 - `src/components/ui/ErrorMessage.tsx` - Reusable error message component with variants
 - `src/components/ui/LoadingSpinner.tsx` - Reusable loading spinner component with size/color options
 - `src/components/ui/LoadingButton.tsx` - Reusable button component with integrated loading state
 - `src/components/ui/index.ts` - UI components barrel export file
-- `src/contexts/AuthContext.tsx` - React context for global authentication state with session restoration, monitoring, automatic refresh, and inactivity tracking
-- `src/hooks/useAuth.ts` - Custom hook with enhanced auth methods, session management, inactivity status, and individual loading/error states
+- `src/contexts/AuthContext.tsx` - React context for global authentication state with session restoration, monitoring, automatic refresh, inactivity tracking, and post-login routing integration
+- `src/hooks/useAuth.ts` - Custom hook with enhanced auth methods, session management, inactivity status, post-login routing, onboarding completion, and individual loading/error states
 - `src/services/authService.ts` - Authentication service with email verification and comprehensive auth operations
 - `src/services/loginService.ts` - Dedicated login service with rate limiting, validation, and error handling
 - `src/services/passwordResetService.ts` - Dedicated password reset service with enhanced UX, security features, and instructions
 - `src/services/passwordResetConfirmService.ts` - Password reset confirmation service with session validation, error guidance, and security features
 - `src/services/sessionService.ts` - Session management service with automatic restoration, monitoring, refresh, and lifecycle management
 - `src/services/inactivityService.ts` - Inactivity tracking service with configurable timeouts, warnings, activity monitoring, and automatic logout
+- `src/services/userProfileService.ts` - User profile service with new/returning user detection, onboarding status tracking, and post-login routing logic
 - `src/types/auth.ts` - TypeScript interfaces for authentication data types
 - `src/utils/validation.ts` - Email and password validation utility functions
 - `.env.local` - Environment variables for Supabase configuration
@@ -69,7 +70,7 @@
     - [x] 4.2 Implement automatic session restoration on app load
     - [x] 4.3 Set up automatic logout after 24 hours of inactivity
     - [x] 4.4 Create login/register pages with proper routing
-    - [ ] 4.5 Implement post-login routing (new users to welcome, returning to dashboard)
+    - [x] 4.5 Implement post-login routing (new users to welcome, returning to dashboard)
     - [ ] 4.6 Add logout functionality with session cleanup
 
 - [ ] 5.0 Implement error handling and user feedback systems
