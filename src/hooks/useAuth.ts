@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth as useAuthContext } from '../contexts/AuthContext'
 import { loginService } from '../services/loginService'
+import { sessionService } from '../services/sessionService'
 import type { LoginCredentials, RegisterCredentials, PasswordResetRequest } from '../types/auth'
 
 interface UseAuthReturn {
@@ -46,13 +47,20 @@ interface UseAuthReturn {
     error: string | null
   }
   
+  refreshSession: {
+    execute: () => Promise<void>
+    loading: boolean
+    error: string | null
+  }
+  
   // Utility methods
   clearErrors: () => void
   checkLoginStatus: () => Promise<boolean>
+  getSessionInfo: () => ReturnType<typeof sessionService.getSessionInfo>
 }
 
 export const useAuth = (): UseAuthReturn => {
-  const { user, session, loading: contextLoading, signUp, signOut, resetPassword: resetPasswordContext, updatePassword: updatePasswordContext, confirmPasswordReset: confirmPasswordResetContext } = useAuthContext()
+  const { user, session, loading: contextLoading, signUp, signOut, resetPassword: resetPasswordContext, updatePassword: updatePasswordContext, confirmPasswordReset: confirmPasswordResetContext, refreshSession: refreshSessionContext } = useAuthContext()
   
   // Individual loading states for each operation
   const [loginLoading, setLoginLoading] = useState(false)
@@ -61,6 +69,7 @@ export const useAuth = (): UseAuthReturn => {
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false)
   const [updatePasswordLoading, setUpdatePasswordLoading] = useState(false)
   const [confirmPasswordResetLoading, setConfirmPasswordResetLoading] = useState(false)
+  const [refreshSessionLoading, setRefreshSessionLoading] = useState(false)
   
   // Individual error states for each operation
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -69,6 +78,7 @@ export const useAuth = (): UseAuthReturn => {
   const [resetPasswordError, setResetPasswordError] = useState<string | null>(null)
   const [updatePasswordError, setUpdatePasswordError] = useState<string | null>(null)
   const [confirmPasswordResetError, setConfirmPasswordResetError] = useState<string | null>(null)
+  const [refreshSessionError, setRefreshSessionError] = useState<string | null>(null)
 
   const handleError = (error: any): string => {
     if (error?.message) {
@@ -207,6 +217,25 @@ export const useAuth = (): UseAuthReturn => {
     error: confirmPasswordResetError
   }
 
+  const refreshSession = {
+    execute: async () => {
+      setRefreshSessionLoading(true)
+      setRefreshSessionError(null)
+      
+      try {
+        await refreshSessionContext()
+      } catch (error) {
+        const errorMessage = handleError(error)
+        setRefreshSessionError(errorMessage)
+        throw error
+      } finally {
+        setRefreshSessionLoading(false)
+      }
+    },
+    loading: refreshSessionLoading,
+    error: refreshSessionError
+  }
+
   const clearErrors = () => {
     setLoginError(null)
     setRegisterError(null)
@@ -214,6 +243,7 @@ export const useAuth = (): UseAuthReturn => {
     setResetPasswordError(null)
     setUpdatePasswordError(null)
     setConfirmPasswordResetError(null)
+    setRefreshSessionError(null)
   }
 
   const checkLoginStatus = async (): Promise<boolean> => {
@@ -223,6 +253,10 @@ export const useAuth = (): UseAuthReturn => {
     } catch (error) {
       return false
     }
+  }
+
+  const getSessionInfo = () => {
+    return sessionService.getSessionInfo(session)
   }
 
   return {
@@ -235,7 +269,9 @@ export const useAuth = (): UseAuthReturn => {
     resetPassword,
     updatePassword,
     confirmPasswordReset,
+    refreshSession,
     clearErrors,
-    checkLoginStatus
+    checkLoginStatus,
+    getSessionInfo
   }
 } 
