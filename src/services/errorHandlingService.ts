@@ -404,7 +404,4 @@ class ErrorHandlingService {
 }
 
 // Export singleton instance
-export const errorHandlingService = new ErrorHandlingService()
-
-// Export types for use in other modules
-export type { ErrorInfo, RetryConfig } 
+export const errorHandlingService = new ErrorHandlingService() 

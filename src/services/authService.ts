@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
-import type { LoginCredentials, RegisterCredentials, PasswordResetRequest } from '../types/auth'
+import { errorHandlingService } from './errorHandlingService'
+import type { RegisterCredentials, PasswordResetRequest } from '../types/auth'
 
 export interface RegistrationResult {
   user: any
@@ -19,25 +20,35 @@ class AuthService {
   async registerWithEmailVerification(credentials: RegisterCredentials): Promise<RegistrationResult> {
     const { email, password } = credentials
     
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`
-      }
-    })
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/confirm`
+          }
+        })
 
-    if (error) {
-      throw error
-    }
+        if (error) {
+          errorHandlingService.logError(error, 'registerWithEmailVerification')
+          throw error
+        }
 
-    // Check if user needs email verification
-    const needsEmailVerification = !data.session && !!data.user
-    
-    return {
-      user: data.user,
-      session: data.session,
-      needsEmailVerification
+        // Check if user needs email verification
+        const needsEmailVerification = !data.session && !!data.user
+        
+        return {
+          user: data.user,
+          session: data.session,
+          needsEmailVerification
+        }
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
     }
   }
 
@@ -45,16 +56,26 @@ class AuthService {
    * Resend email verification
    */
   async resendEmailVerification(email: string): Promise<void> {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`
-      }
-    })
+    try {
+      await errorHandlingService.executeWithRetry(async () => {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/confirm`
+          }
+        })
 
-    if (error) {
-      throw error
+        if (error) {
+          errorHandlingService.logError(error, 'resendEmailVerification')
+          throw error
+        }
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
     }
   }
 
@@ -86,86 +107,172 @@ class AuthService {
   }
 
   /**
-   * Sign in user
+   * Sign in with email and password with error handling
    */
-  async signIn(credentials: LoginCredentials) {
-    const { email, password } = credentials
-    
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
+  async signIn(credentials: { email: string; password: string }) {
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        })
 
-    if (error) {
-      throw error
-    }
+        if (error) {
+          errorHandlingService.logError(error, 'signIn')
+          throw error
+        }
 
-    return data
-  }
-
-  /**
-   * Sign out user
-   */
-  async signOut(): Promise<void> {
-    const { error } = await supabase.auth.signOut()
-    
-    if (error) {
-      throw error
+        return data
+      }, { maxAttempts: 2 }) // Retry once for auth operations
+    } catch (error) {
+      // Re-throw with enhanced error information
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
     }
   }
 
   /**
-   * Request password reset
+   * Sign out with error handling
+   */
+  async signOut() {
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+          errorHandlingService.logError(error, 'signOut')
+          throw error
+        }
+      }, { maxAttempts: 1 }) // Don't retry logout operations
+    } catch (error) {
+      errorHandlingService.logError(error, 'signOut')
+      // For logout, we don't want to throw errors - just log them
+      console.warn('Logout warning:', error)
+    }
+  }
+
+  /**
+   * Request password reset (alias for resetPassword for backward compatibility)
    */
   async requestPasswordReset(request: PasswordResetRequest): Promise<void> {
-    const { email } = request
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`
-    })
-
-    if (error) {
-      throw error
-    }
+    await this.resetPassword(request.email)
   }
 
   /**
-   * Update user password
+   * Reset password with error handling
    */
-  async updatePassword(password: string): Promise<void> {
-    const { error } = await supabase.auth.updateUser({
-      password
-    })
+  async resetPassword(email: string) {
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        })
 
-    if (error) {
-      throw error
+        if (error) {
+          errorHandlingService.logError(error, 'resetPassword')
+          throw error
+        }
+
+        return data
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
     }
   }
 
   /**
-   * Get current user session
+   * Update password with error handling
+   */
+  async updatePassword(password: string) {
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data, error } = await supabase.auth.updateUser({
+          password: password
+        })
+
+        if (error) {
+          errorHandlingService.logError(error, 'updatePassword')
+          throw error
+        }
+
+        return data
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
+    }
+  }
+
+  /**
+   * Get current session with error handling
    */
   async getCurrentSession() {
-    const { data: { session }, error } = await supabase.auth.getSession()
-    
-    if (error) {
-      throw error
-    }
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data: { session }, error } = await supabase.auth.getSession()
 
-    return session
+        if (error) {
+          errorHandlingService.logError(error, 'getCurrentSession')
+          throw error
+        }
+
+        return session
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      errorHandlingService.logError(error, 'getCurrentSession')
+      return null
+    }
   }
 
   /**
-   * Get current user
+   * Get current user with error handling
    */
   async getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    
-    if (error) {
-      throw error
-    }
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data: { user }, error } = await supabase.auth.getUser()
 
-    return user
+        if (error) {
+          errorHandlingService.logError(error, 'getCurrentUser')
+          throw error
+        }
+
+        return user
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      errorHandlingService.logError(error, 'getCurrentUser')
+      return null
+    }
+  }
+
+  /**
+   * Refresh session with error handling
+   */
+  async refreshSession() {
+    try {
+      return await errorHandlingService.executeWithRetry(async () => {
+        const { data, error } = await supabase.auth.refreshSession()
+
+        if (error) {
+          errorHandlingService.logError(error, 'refreshSession')
+          throw error
+        }
+
+        return data
+      }, { maxAttempts: 2 })
+    } catch (error) {
+      const userMessage = errorHandlingService.getUserMessage(error)
+      const enhancedError = new Error(userMessage)
+      ;(enhancedError as any).originalError = error
+      throw enhancedError
+    }
   }
 }
 

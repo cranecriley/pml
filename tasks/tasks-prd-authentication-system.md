@@ -12,8 +12,9 @@
 - `src/components/auth/EmailVerification.tsx` - Email verification component with resend functionality
 - `src/components/auth/EmailConfirmation.tsx` - Email confirmation handler for verification redirect
 - `src/components/auth/InactivityWarning.tsx` - Modal warning component for inactivity timeout with session extension options
-- `src/components/auth/AuthWrapper.tsx` - Wrapper component that integrates inactivity warnings with the app
+- `src/components/auth/AuthWrapper.tsx` - Wrapper component that integrates inactivity warnings and network status monitoring
 - `src/components/auth/LogoutButton.tsx` - Comprehensive logout component with confirmation dialog, loading states, and session cleanup
+- `src/components/feedback/NetworkStatus.tsx` - Network connectivity monitoring component with real-time status updates and retry functionality
 - `src/pages/LoginPage.tsx` - Dedicated login page with proper routing, authentication checks, post-login routing logic, and navigation links
 - `src/pages/RegisterPage.tsx` - Dedicated registration page with success flow, email verification instructions, and navigation
 - `src/pages/PasswordResetPage.tsx` - Password reset request page with simplified flow and navigation links
@@ -24,13 +25,14 @@
 - `src/components/ui/index.ts` - UI components barrel export file with logout components
 - `src/contexts/AuthContext.tsx` - React context for global authentication state with session restoration, monitoring, automatic refresh, inactivity tracking, and post-login routing integration
 - `src/hooks/useAuth.ts` - Custom hook with enhanced auth methods, session management, inactivity status, post-login routing, onboarding completion, and individual loading/error states
-- `src/services/authService.ts` - Authentication service with email verification and comprehensive auth operations
+- `src/services/authService.ts` - Authentication service with email verification, comprehensive auth operations, and integrated error handling with retry logic
 - `src/services/loginService.ts` - Dedicated login service with rate limiting, validation, error handling, and comprehensive session cleanup
 - `src/services/passwordResetService.ts` - Dedicated password reset service with enhanced UX, security features, and instructions
 - `src/services/passwordResetConfirmService.ts` - Password reset confirmation service with session validation, error guidance, and security features
 - `src/services/sessionService.ts` - Session management service with automatic restoration, monitoring, refresh, and lifecycle management
 - `src/services/inactivityService.ts` - Inactivity tracking service with configurable timeouts, warnings, activity monitoring, and automatic logout
 - `src/services/userProfileService.ts` - User profile service with new/returning user detection, onboarding status tracking, and post-login routing logic
+- `src/services/errorHandlingService.ts` - Comprehensive error handling service with network failure detection, retry logic, categorization, and user-friendly messaging
 - `src/types/auth.ts` - TypeScript interfaces for authentication data types
 - `src/utils/validation.ts` - Email and password validation utility functions
 - `.env.local` - Environment variables for Supabase configuration
@@ -75,7 +77,7 @@
     - [x] 4.6 Add logout functionality with comprehensive session cleanup and user confirmation
 
 - [ ] 5.0 Implement error handling and user feedback systems
-    - [ ] 5.1 Add comprehensive error handling for network failures
+    - [x] 5.1 Add comprehensive error handling for network failures with retry logic, connectivity monitoring, and user-friendly messaging
     - [ ] 5.2 Implement rate limiting feedback for failed login attempts
     - [ ] 5.3 Add loading states for all authentication operations
     - [ ] 5.4 Create user-friendly error messages for all auth scenarios
