@@ -128,16 +128,96 @@ class LoginService {
   }
 
   /**
-   * Handle logout
+   * Handle logout with comprehensive session cleanup
    */
   async logout(): Promise<void> {
     try {
+      // Clear Supabase session
       await authService.signOut()
+      
+      // Perform comprehensive cleanup
+      this.performLogoutCleanup()
+      
+      console.log('Logout completed successfully')
     } catch (error: any) {
       // Even if logout fails on the server, we should clear local state
-      console.warn('Logout warning:', error.message)
-      throw new Error('Logout completed, but there may have been a connection issue.')
+      console.warn('Server logout warning:', error.message)
+      
+      // Still perform local cleanup
+      this.performLogoutCleanup()
+      
+      // Don't throw error for logout - we want to ensure user is logged out locally
+      console.log('Local logout cleanup completed despite server error')
     }
+  }
+
+  /**
+   * Perform comprehensive local cleanup during logout
+   */
+  private performLogoutCleanup(): void {
+    try {
+      // Clear Supabase-related localStorage items
+      const supabaseKeys = Object.keys(localStorage).filter(key => 
+        key.startsWith('supabase.') || 
+        key.includes('supabase') ||
+        key.startsWith('sb-')
+      )
+      
+      supabaseKeys.forEach(key => {
+        localStorage.removeItem(key)
+      })
+
+      // Clear any app-specific auth data
+      const authKeys = [
+        'auth_token',
+        'user_session',
+        'login_timestamp',
+        'last_activity',
+        'session_expiry',
+        'user_preferences',
+        'auth_state'
+      ]
+      
+      authKeys.forEach(key => {
+        localStorage.removeItem(key)
+        sessionStorage.removeItem(key)
+      })
+
+      // Clear any cached user data
+      const userDataKeys = Object.keys(localStorage).filter(key =>
+        key.startsWith('user_') ||
+        key.startsWith('profile_') ||
+        key.startsWith('settings_')
+      )
+      
+      userDataKeys.forEach(key => {
+        localStorage.removeItem(key)
+      })
+
+      console.log('Local storage cleanup completed')
+    } catch (error) {
+      console.warn('Error during logout cleanup:', error)
+      // Don't throw - cleanup failure shouldn't prevent logout
+    }
+  }
+
+  /**
+   * Force logout - clears everything regardless of server response
+   */
+  async forceLogout(): Promise<void> {
+    console.log('Performing force logout...')
+    
+    // Perform local cleanup first
+    this.performLogoutCleanup()
+    
+    // Try to logout from server (but don't wait or throw on failure)
+    try {
+      await authService.signOut()
+    } catch (error) {
+      console.warn('Force logout: Server logout failed, but continuing with local logout')
+    }
+    
+    console.log('Force logout completed')
   }
 
   /**

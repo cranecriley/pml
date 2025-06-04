@@ -5,7 +5,7 @@ interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   isLoading?: boolean
   loadingText?: string
   children: React.ReactNode
-  variant?: 'primary' | 'secondary'
+  variant?: 'primary' | 'secondary' | 'danger'
   size?: 'sm' | 'md' | 'lg'
 }
 
@@ -23,7 +23,8 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
   
   const variantClasses = {
     primary: "border-transparent text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500",
-    secondary: "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500"
+    secondary: "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-blue-500",
+    danger: "border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500"
   }
 
   const sizeClasses = {
@@ -34,6 +35,18 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
 
   const fullSizeClass = props.type === 'submit' ? 'w-full' : ''
 
+  const getSpinnerColor = () => {
+    switch (variant) {
+      case 'primary':
+      case 'danger':
+        return 'white'
+      case 'secondary':
+        return 'blue'
+      default:
+        return 'blue'
+    }
+  }
+
   return (
     <button
       {...props}
@@ -42,7 +55,7 @@ export const LoadingButton: React.FC<LoadingButtonProps> = ({
     >
       {isLoading ? (
         <div className="flex items-center">
-          <LoadingSpinner size="sm" color={variant === 'primary' ? 'white' : 'blue'} className="-ml-1 mr-3" />
+          <LoadingSpinner size="sm" color={getSpinnerColor()} className="-ml-1 mr-3" />
           {loadingText || children}
         </div>
       ) : (
