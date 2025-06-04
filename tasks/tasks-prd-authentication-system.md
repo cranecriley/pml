@@ -11,17 +11,20 @@
 - `src/components/auth/ProtectedRoute.tsx` - Route protection component with authentication guards, loading states, and redirect logic
 - `src/components/auth/EmailVerification.tsx` - Email verification component with resend functionality
 - `src/components/auth/EmailConfirmation.tsx` - Email confirmation handler for verification redirect
+- `src/components/auth/InactivityWarning.tsx` - Modal warning component for inactivity timeout with session extension options
+- `src/components/auth/AuthWrapper.tsx` - Wrapper component that integrates inactivity warnings with the app
 - `src/components/ui/ErrorMessage.tsx` - Reusable error message component with variants
 - `src/components/ui/LoadingSpinner.tsx` - Reusable loading spinner component with size/color options
 - `src/components/ui/LoadingButton.tsx` - Reusable button component with integrated loading state
 - `src/components/ui/index.ts` - UI components barrel export file
-- `src/contexts/AuthContext.tsx` - React context for global authentication state with session restoration, monitoring, and automatic refresh
-- `src/hooks/useAuth.ts` - Custom hook with enhanced auth methods, session management, and individual loading/error states
+- `src/contexts/AuthContext.tsx` - React context for global authentication state with session restoration, monitoring, automatic refresh, and inactivity tracking
+- `src/hooks/useAuth.ts` - Custom hook with enhanced auth methods, session management, inactivity status, and individual loading/error states
 - `src/services/authService.ts` - Authentication service with email verification and comprehensive auth operations
 - `src/services/loginService.ts` - Dedicated login service with rate limiting, validation, and error handling
 - `src/services/passwordResetService.ts` - Dedicated password reset service with enhanced UX, security features, and instructions
 - `src/services/passwordResetConfirmService.ts` - Password reset confirmation service with session validation, error guidance, and security features
 - `src/services/sessionService.ts` - Session management service with automatic restoration, monitoring, refresh, and lifecycle management
+- `src/services/inactivityService.ts` - Inactivity tracking service with configurable timeouts, warnings, activity monitoring, and automatic logout
 - `src/types/auth.ts` - TypeScript interfaces for authentication data types
 - `src/utils/validation.ts` - Email and password validation utility functions
 - `.env.local` - Environment variables for Supabase configuration
@@ -60,7 +63,7 @@
 - [ ] 4.0 Add route protection and session management
     - [x] 4.1 Create ProtectedRoute component to guard authenticated pages
     - [x] 4.2 Implement automatic session restoration on app load
-    - [ ] 4.3 Set up automatic logout after 24 hours of inactivity
+    - [x] 4.3 Set up automatic logout after 24 hours of inactivity
     - [ ] 4.4 Create login/register pages with proper routing
     - [ ] 4.5 Implement post-login routing (new users to welcome, returning to dashboard)
     - [ ] 4.6 Add logout functionality with session cleanup

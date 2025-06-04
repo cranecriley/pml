@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth as useAuthContext } from '../contexts/AuthContext'
 import { loginService } from '../services/loginService'
 import { sessionService } from '../services/sessionService'
+import { inactivityService } from '../services/inactivityService'
 import type { LoginCredentials, RegisterCredentials, PasswordResetRequest } from '../types/auth'
 
 interface UseAuthReturn {
@@ -9,6 +10,10 @@ interface UseAuthReturn {
   user: any
   session: any
   loading: boolean
+  inactivityWarning: {
+    isVisible: boolean
+    timeRemaining: number
+  }
   
   // Auth methods with their own loading states
   login: {
@@ -57,10 +62,26 @@ interface UseAuthReturn {
   clearErrors: () => void
   checkLoginStatus: () => Promise<boolean>
   getSessionInfo: () => ReturnType<typeof sessionService.getSessionInfo>
+  extendSession: () => void
+  dismissInactivityWarning: () => void
+  getInactivityStatus: () => ReturnType<typeof inactivityService.getStatus>
 }
 
 export const useAuth = (): UseAuthReturn => {
-  const { user, session, loading: contextLoading, signUp, signOut, resetPassword: resetPasswordContext, updatePassword: updatePasswordContext, confirmPasswordReset: confirmPasswordResetContext, refreshSession: refreshSessionContext } = useAuthContext()
+  const { 
+    user, 
+    session, 
+    loading: contextLoading, 
+    inactivityWarning,
+    signUp, 
+    signOut, 
+    resetPassword: resetPasswordContext, 
+    updatePassword: updatePasswordContext, 
+    confirmPasswordReset: confirmPasswordResetContext, 
+    refreshSession: refreshSessionContext,
+    extendSession: extendSessionContext,
+    dismissInactivityWarning: dismissInactivityWarningContext
+  } = useAuthContext()
   
   // Individual loading states for each operation
   const [loginLoading, setLoginLoading] = useState(false)
@@ -259,10 +280,23 @@ export const useAuth = (): UseAuthReturn => {
     return sessionService.getSessionInfo(session)
   }
 
+  const extendSession = () => {
+    extendSessionContext()
+  }
+
+  const dismissInactivityWarning = () => {
+    dismissInactivityWarningContext()
+  }
+
+  const getInactivityStatus = () => {
+    return inactivityService.getStatus()
+  }
+
   return {
     user,
     session,
     loading: contextLoading,
+    inactivityWarning,
     login,
     register,
     logout,
@@ -272,6 +306,9 @@ export const useAuth = (): UseAuthReturn => {
     refreshSession,
     clearErrors,
     checkLoginStatus,
-    getSessionInfo
+    getSessionInfo,
+    extendSession,
+    dismissInactivityWarning,
+    getInactivityStatus
   }
 } 

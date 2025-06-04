@@ -6,11 +6,16 @@ import { authService } from '../services/authService'
 import { passwordResetService } from '../services/passwordResetService'
 import { passwordResetConfirmService } from '../services/passwordResetConfirmService'
 import { sessionService } from '../services/sessionService'
+import { inactivityService } from '../services/inactivityService'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  inactivityWarning: {
+    isVisible: boolean
+    timeRemaining: number
+  }
   signUp: (email: string, password: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
@@ -18,6 +23,8 @@ interface AuthContextType {
   updatePassword: (password: string) => Promise<void>
   confirmPasswordReset: (newPassword: string, confirmPassword: string) => Promise<{ success: boolean; message: string; shouldRedirectToLogin?: boolean }>
   refreshSession: () => Promise<void>
+  extendSession: () => void
+  dismissInactivityWarning: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -38,6 +45,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [inactivityWarning, setInactivityWarning] = useState({
+    isVisible: false,
+    timeRemaining: 0
+  })
   const cleanupRefs = useRef<(() => void)[]>([])
 
   useEffect(() => {
@@ -50,6 +61,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (restoreResult.isValid && restoreResult.session) {
           setSession(restoreResult.session)
           setUser(restoreResult.user)
+          
+          // Start inactivity monitoring for authenticated users
+          startInactivityMonitoring()
         } else {
           setSession(null)
           setUser(null)
@@ -66,6 +80,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
 
+    const startInactivityMonitoring = () => {
+      inactivityService.start({
+        onWarning: (timeRemaining) => {
+          console.log('Inactivity warning triggered, time remaining:', timeRemaining)
+          setInactivityWarning({
+            isVisible: true,
+            timeRemaining
+          })
+        },
+        onTimeout: () => {
+          console.log('Inactivity timeout reached, logging out')
+          handleInactivityLogout()
+        },
+        onActivity: () => {
+          // Dismiss warning if user becomes active
+          setInactivityWarning(prev => ({
+            ...prev,
+            isVisible: false
+          }))
+        }
+      })
+    }
+
+    const handleInactivityLogout = async () => {
+      try {
+        setInactivityWarning({ isVisible: false, timeRemaining: 0 })
+        await signOut()
+        // Could show a toast notification here about the automatic logout
+      } catch (error) {
+        console.error('Error during inactivity logout:', error)
+      }
+    }
+
     initializeAuth()
 
     // Listen for auth changes
@@ -76,11 +123,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           setSession(session)
           setUser(session?.user ?? null)
+          
+          // Start inactivity monitoring when user signs in
+          if (session?.user) {
+            startInactivityMonitoring()
+          }
         } else if (event === 'SIGNED_OUT') {
           setSession(null)
           setUser(null)
-          // Stop session monitoring when signed out
+          setInactivityWarning({ isVisible: false, timeRemaining: 0 })
+          
+          // Stop both session and inactivity monitoring when signed out
           sessionService.stopSessionMonitoring()
+          inactivityService.stop()
         }
         
         setLoading(false)
@@ -88,14 +143,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     )
 
     // Start session monitoring for authenticated users
-    const startMonitoring = () => {
+    const startSessionMonitoring = () => {
       sessionService.startSessionMonitoring(
         // On session expired
         () => {
           console.log('Session expired, signing out')
+          inactivityService.stop()
           setSession(null)
           setUser(null)
-          // Note: Don't call signOut here to avoid infinite loop
+          setInactivityWarning({ isVisible: false, timeRemaining: 0 })
         },
         // On session refreshed
         (newSession) => {
@@ -108,7 +164,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Start monitoring if we have a session
     if (session) {
-      startMonitoring()
+      startSessionMonitoring()
     }
 
     // Handle browser visibility changes for session validation
@@ -116,8 +172,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (session) {
         const restoreResult = await sessionService.restoreSession()
         if (!restoreResult.isValid) {
+          inactivityService.stop()
           setSession(null)
           setUser(null)
+          setInactivityWarning({ isVisible: false, timeRemaining: 0 })
         }
       }
     })
@@ -126,6 +184,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     cleanupRefs.current = [
       () => subscription.unsubscribe(),
       () => sessionService.stopSessionMonitoring(),
+      () => inactivityService.stop(),
       cleanupVisibilityHandler
     ]
 
@@ -152,8 +211,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signOut = async () => {
-    // Stop session monitoring before signing out
+    // Stop both session and inactivity monitoring before signing out
     sessionService.stopSessionMonitoring()
+    inactivityService.stop()
+    setInactivityWarning({ isVisible: false, timeRemaining: 0 })
     await loginService.logout()
   }
 
@@ -198,10 +259,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  const extendSession = () => {
+    inactivityService.extendSession()
+    setInactivityWarning({ isVisible: false, timeRemaining: 0 })
+  }
+
+  const dismissInactivityWarning = () => {
+    setInactivityWarning(prev => ({
+      ...prev,
+      isVisible: false
+    }))
+  }
+
   const value: AuthContextType = {
     user,
     session,
     loading,
+    inactivityWarning,
     signUp,
     signIn,
     signOut,
@@ -209,6 +283,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updatePassword,
     confirmPasswordReset,
     refreshSession,
+    extendSession,
+    dismissInactivityWarning,
   }
 
   return (
