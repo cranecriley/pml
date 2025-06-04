@@ -5,6 +5,8 @@ import { validateEmail, validatePassword } from '../../utils/validation'
 import { ErrorMessage } from '../ui/ErrorMessage'
 import { LoadingButton } from '../ui/LoadingButton'
 import { RateLimitWarning } from '../feedback/RateLimitWarning'
+import { AuthProgressIndicator } from '../feedback/ProgressIndicator'
+import { LoginFeedback, type ActionState } from '../feedback/ActionFeedback'
 
 interface LoginFormProps {
   onSuccess?: () => void
@@ -21,6 +23,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
     password?: string
   }>({})
   const [isRateLimited, setIsRateLimited] = useState(false)
+  const [loginStep, setLoginStep] = useState<'credentials' | 'verification' | 'processing' | 'complete' | 'error'>('credentials')
+  const [feedbackState, setFeedbackState] = useState<ActionState>('idle')
+
+  const { login } = useAuth()
 
   const validateForm = () => {
     const errors: { email?: string; password?: string } = {}
@@ -39,31 +45,58 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
     e.preventDefault()
     setError('')
     setValidationErrors({})
+    setFeedbackState('idle')
 
     if (isRateLimited) {
       setError('Please wait before attempting to login again.')
+      setFeedbackState('warning')
       return
     }
 
-    if (!validateForm()) return
+    if (!validateForm()) {
+      setFeedbackState('warning')
+      return
+    }
     
     try {
-      await login(credentials)
+      // Start login process
+      setLoginStep('verification')
+      setFeedbackState('loading')
       
-      if (onSuccess) {
-        onSuccess()
-      }
+      // Add small delay to show verification step
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setLoginStep('processing')
+      
+      await login.execute({ email, password })
+      
+      // Success state
+      setLoginStep('complete')
+      setFeedbackState('success')
+      
+      // Redirect after success message
+      setTimeout(() => {
+        if (onSuccess) {
+          onSuccess()
+        }
+      }, 1500)
+      
     } catch (err: any) {
       console.error('Login error:', err)
+      
+      setLoginStep('error')
+      setFeedbackState('error')
       
       if (err.isRateLimited) {
         setError(err.message)
         return
       }
       
-      // Error handling is managed by parent component
+      setError(err.message || 'Login failed. Please try again.')
     }
   }
+
+  // Determine if we should show progress indicator
+  const showProgress = feedbackState === 'loading' || loginStep !== 'credentials'
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -76,6 +109,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
         </p>
       </div>
 
+      {/* Progress Indicator */}
+      {showProgress && (
+        <AuthProgressIndicator 
+          currentStep={loginStep}
+          variant="minimal"
+          className="mb-4"
+        />
+      )}
+
+      {/* Rate Limiting Warning */}
       {email && (
         <RateLimitWarning 
           email={email}
@@ -84,7 +127,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
         />
       )}
 
-      {error && <ErrorMessage message={error} />}
+      {/* Enhanced Action Feedback */}
+      <LoginFeedback 
+        state={feedbackState}
+        className="mb-4"
+      />
+
+      {/* Legacy Error Display (for custom errors) */}
+      {error && feedbackState === 'idle' && <ErrorMessage message={error} />}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -96,12 +146,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full px-3 py-2 sm:py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm ${
+            className={`w-full px-3 py-2 sm:py-3 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm transition-colors duration-200 ${
               validationErrors.email ? 'border-red-500' : 'border-gray-300'
             }`}
             placeholder="Enter your email"
             required
-            disabled={isLoading}
+            disabled={login.loading}
           />
           {validationErrors.email && (
             <ErrorMessage message={validationErrors.email} variant="inline" />
@@ -118,18 +168,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-3 py-2 sm:py-3 pr-10 sm:pr-12 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm ${
+              className={`w-full px-3 py-2 sm:py-3 pr-10 sm:pr-12 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm transition-colors duration-200 ${
                 validationErrors.password ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Enter your password"
               required
-              disabled={isLoading}
+              disabled={login.loading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 touch-manipulation"
-              disabled={isLoading}
+              className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-gray-600 touch-manipulation transition-colors duration-200"
+              disabled={login.loading}
             >
               {showPassword ? (
                 <svg className="h-5 w-5 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,24 +201,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
         <div>
           <LoadingButton
             type="submit"
-            loading={isLoading}
-            disabled={isRateLimited}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            isLoading={login.loading}
+            disabled={isRateLimited || loginStep === 'complete'}
+            variant="primary"
+            size="md"
+            className="w-full transition-all duration-200"
+            loadingText={
+              loginStep === 'verification' ? 'Verifying...' :
+              loginStep === 'processing' ? 'Processing...' :
+              'Signing In...'
+            }
           >
-            {isRateLimited ? 'Please Wait...' : 'Sign In'}
+            {isRateLimited ? 'Please Wait...' : 
+             loginStep === 'complete' ? 'Success!' : 
+             'Sign In'}
           </LoadingButton>
         </div>
 
         <div className="flex items-center justify-between">
           <Link
             to="/auth/password-reset"
-            className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-500 hover:underline transition-colors duration-200"
           >
             Forgot your password?
           </Link>
           <Link
             to="/auth/register"
-            className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-500 hover:underline transition-colors duration-200"
           >
             Create an account
           </Link>
