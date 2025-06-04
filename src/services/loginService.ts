@@ -1,5 +1,6 @@
 import { authService } from './authService'
 import { validateEmail, validatePassword } from '../utils/validation'
+import { rateLimitingService } from './rateLimitingService'
 import type { LoginCredentials } from '../types/auth'
 
 export interface LoginResult {
@@ -40,6 +41,23 @@ class LoginService {
   }
 
   /**
+   * Check rate limit before login attempt
+   */
+  checkRateLimit(email: string): { canAttempt: boolean; message?: string; waitTimeMs?: number } {
+    const rateLimitInfo = rateLimitingService.checkRateLimit(email)
+    
+    if (rateLimitInfo.isLimited) {
+      return {
+        canAttempt: false,
+        message: rateLimitInfo.message,
+        waitTimeMs: rateLimitInfo.waitTimeMs
+      }
+    }
+    
+    return { canAttempt: true }
+  }
+
+  /**
    * Attempt to log in user with email and password
    */
   async loginWithEmailPassword(credentials: LoginCredentials): Promise<LoginResult> {
@@ -49,6 +67,15 @@ class LoginService {
       throw new Error('Invalid credentials provided')
     }
 
+    // Check rate limiting before attempting login
+    const rateLimitCheck = this.checkRateLimit(credentials.email)
+    if (!rateLimitCheck.canAttempt) {
+      const error = new Error(rateLimitCheck.message || 'Too many login attempts')
+      ;(error as any).isRateLimited = true
+      ;(error as any).waitTimeMs = rateLimitCheck.waitTimeMs
+      throw error
+    }
+
     try {
       const authResult = await authService.signIn(credentials)
       
@@ -56,8 +83,16 @@ class LoginService {
       const needsEmailVerification = !authResult.session && !!authResult.user && !authResult.user.email_confirmed_at
       
       if (needsEmailVerification) {
+        // Record failed attempt for email verification requirement
+        rateLimitingService.recordAttempt(credentials.email, false)
         throw new Error('Please verify your email address before logging in. Check your inbox for a verification link.')
       }
+
+      // Record successful login attempt
+      rateLimitingService.recordAttempt(credentials.email, true)
+      
+      // Reset rate limiting on successful login
+      rateLimitingService.resetRateLimit(credentials.email)
 
       return {
         user: authResult.user,
@@ -65,6 +100,11 @@ class LoginService {
         needsEmailVerification: false
       }
     } catch (error: any) {
+      // Record failed login attempt (unless it's a rate limit error)
+      if (!error.isRateLimited) {
+        rateLimitingService.recordAttempt(credentials.email, false)
+      }
+
       // Handle specific Supabase auth errors
       if (error.message) {
         // Common Supabase auth error messages
@@ -91,18 +131,8 @@ class LoginService {
    * Handle login with rate limiting check
    */
   async loginWithRateLimit(credentials: LoginCredentials, maxAttempts: number = 5): Promise<LoginResult> {
-    // In a real implementation, you might track failed attempts in localStorage or server-side
-    // For now, we'll rely on Supabase's built-in rate limiting
-    
-    try {
-      return await this.loginWithEmailPassword(credentials)
-    } catch (error: any) {
-      // If it's a rate limit error, provide helpful guidance
-      if (error.message.includes('Too many requests') || error.message.includes('rate limit')) {
-        throw new Error(`Too many failed login attempts. Please wait 15 minutes before trying again, or try resetting your password.`)
-      }
-      throw error
-    }
+    // The rate limiting is now handled in loginWithEmailPassword
+    return await this.loginWithEmailPassword(credentials)
   }
 
   /**
@@ -125,6 +155,34 @@ class LoginService {
         session: null
       }
     }
+  }
+
+  /**
+   * Get rate limit information for an email
+   */
+  getRateLimitInfo(email: string) {
+    return rateLimitingService.checkRateLimit(email)
+  }
+
+  /**
+   * Get rate limiting status for display
+   */
+  getRateLimitStatus(email: string) {
+    const info = rateLimitingService.checkRateLimit(email)
+    return {
+      isLimited: info.isLimited,
+      remainingAttempts: info.remainingAttempts,
+      waitTimeMs: info.waitTimeMs,
+      message: info.message,
+      severity: info.severity
+    }
+  }
+
+  /**
+   * Clear rate limiting for an email (admin function)
+   */
+  clearRateLimit(email: string): void {
+    rateLimitingService.resetRateLimit(email)
   }
 
   /**
@@ -193,6 +251,9 @@ class LoginService {
       userDataKeys.forEach(key => {
         localStorage.removeItem(key)
       })
+
+      // Clean up old rate limiting data
+      rateLimitingService.cleanup()
 
       console.log('Local storage cleanup completed')
     } catch (error) {
