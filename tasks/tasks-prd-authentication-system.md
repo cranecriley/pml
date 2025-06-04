@@ -13,6 +13,10 @@
 - `src/components/auth/EmailConfirmation.tsx` - Email confirmation handler for verification redirect
 - `src/components/auth/InactivityWarning.tsx` - Modal warning component for inactivity timeout with session extension options
 - `src/components/auth/AuthWrapper.tsx` - Wrapper component that integrates inactivity warnings with the app
+- `src/pages/LoginPage.tsx` - Dedicated login page with proper routing, authentication checks, and navigation links
+- `src/pages/RegisterPage.tsx` - Dedicated registration page with success flow, email verification instructions, and navigation
+- `src/pages/PasswordResetPage.tsx` - Password reset request page with simplified flow and navigation links
+- `src/routes/index.tsx` - React Router configuration with authentication routes, protected routes, and email confirmation handling
 - `src/components/ui/ErrorMessage.tsx` - Reusable error message component with variants
 - `src/components/ui/LoadingSpinner.tsx` - Reusable loading spinner component with size/color options
 - `src/components/ui/LoadingButton.tsx` - Reusable button component with integrated loading state
@@ -64,7 +68,7 @@
     - [x] 4.1 Create ProtectedRoute component to guard authenticated pages
     - [x] 4.2 Implement automatic session restoration on app load
     - [x] 4.3 Set up automatic logout after 24 hours of inactivity
-    - [ ] 4.4 Create login/register pages with proper routing
+    - [x] 4.4 Create login/register pages with proper routing
     - [ ] 4.5 Implement post-login routing (new users to welcome, returning to dashboard)
     - [ ] 4.6 Add logout functionality with session cleanup
 
