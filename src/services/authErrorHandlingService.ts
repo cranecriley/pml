@@ -27,35 +27,35 @@ class AuthErrorHandlingService {
   /**
    * Process authentication errors and return user-friendly information
    */
-  processAuthError(error: any, context?: ErrorContext): AuthErrorInfo {
+  processAuthError(error: any, _context?: ErrorContext): AuthErrorInfo {
     // Handle Supabase AuthError objects
     if (error instanceof AuthError || error?.message) {
-      return this.categorizeSupabaseError(error, context)
+      return this.categorizeSupabaseError(error, _context)
     }
 
     // Handle custom rate limiting errors
     if (error?.isRateLimited) {
-      return this.handleRateLimitError(error, context)
+      return this.handleRateLimitError(error, _context)
     }
 
     // Handle network errors
     if (this.isNetworkError(error)) {
-      return this.handleNetworkError(error, context)
+      return this.handleNetworkError(error, _context)
     }
 
     // Handle validation errors
     if (this.isValidationError(error)) {
-      return this.handleValidationError(error, context)
+      return this.handleValidationError(error, _context)
     }
 
     // Default unknown error
-    return this.handleUnknownError(error, context)
+    return this.handleUnknownError(error, _context)
   }
 
   /**
    * Categorize Supabase authentication errors
    */
-  private categorizeSupabaseError(error: AuthError | any, context?: ErrorContext): AuthErrorInfo {
+  private categorizeSupabaseError(error: AuthError | any, _context?: ErrorContext): AuthErrorInfo {
     const message = error.message?.toLowerCase() || ''
     const errorCode = error.code || error.status
 
@@ -288,7 +288,7 @@ class AuthErrorHandlingService {
   /**
    * Handle rate limiting errors with specific guidance
    */
-  private handleRateLimitError(error: any, context?: ErrorContext): AuthErrorInfo {
+  private handleRateLimitError(error: any, _context?: ErrorContext): AuthErrorInfo {
     const waitTime = error.waitTimeMs ? Math.ceil(error.waitTimeMs / (1000 * 60)) : 15
 
     return {
@@ -317,7 +317,7 @@ class AuthErrorHandlingService {
   /**
    * Handle network connectivity errors
    */
-  private handleNetworkError(error: any, context?: ErrorContext): AuthErrorInfo {
+  private handleNetworkError(error: any, _context?: ErrorContext): AuthErrorInfo {
     return {
       userMessage: 'Unable to connect to our servers. Please check your internet connection and try again.',
       technicalMessage: error.message || 'Network connectivity error',
@@ -344,7 +344,7 @@ class AuthErrorHandlingService {
   /**
    * Handle validation errors
    */
-  private handleValidationError(error: any, context?: ErrorContext): AuthErrorInfo {
+  private handleValidationError(error: any, _context?: ErrorContext): AuthErrorInfo {
     return {
       userMessage: 'Please check your information and try again.',
       technicalMessage: error.message || 'Validation error',
@@ -365,7 +365,7 @@ class AuthErrorHandlingService {
   /**
    * Handle unknown errors
    */
-  private handleUnknownError(error: any, context?: ErrorContext): AuthErrorInfo {
+  private handleUnknownError(error: any, _context?: ErrorContext): AuthErrorInfo {
     return {
       userMessage: 'An unexpected error occurred. Please try again or contact support if the problem persists.',
       technicalMessage: error?.message || error?.toString() || 'Unknown error',

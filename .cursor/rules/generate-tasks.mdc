@@ -1,6 +1,7 @@
 ---
 description: Creates step-by-step task lists from existing PRDs. Two-phase process: generates parent tasks first, waits for confirmation, then creates sub-tasks. Includes relevant files section.
 globs: /tasks/tasks-*.md, /tasks/prd-*.md
+alwaysApply: false
 ---
 # Rule: Generating a Task List from a PRD
 
@@ -21,9 +22,11 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 3. **Phase 1: Generate Parent Tasks:** Based on the PRD analysis, create the file and generate the main, high-level tasks required to implement the feature. Use your judgement on how many high-level tasks to user. It’s likely to be 3-5. Present these tasks to the user in the specified format (without sub-tasks yet). Inform the user: “I have generated the high-level tasks based on the PRD. Ready to generate the sub-tasks? Respond with ‘Go’ to proceed.”
 4. **Wait for Confirmation:** Pause and wait for the user to respond with “Go”.
 5. **Phase 2: Generate Sub-Tasks:** Once the user confirms, break down each parent task into smaller, actionable sub-tasks. Ensure sub-tasks logically follow from the parent task and cover the implementation details implied by the PRD.
-6. **Identify Relevant Files:** Based on the tasks and PRD, identify potential files that will need to be created or modified. List these under the “Relevant Files” section with a brief description of their purpose in relation to the tasks.
-7. **Generate Final Output:** Combine the parent tasks, sub-tasks, and relevant files into the final Markdown structure.
-8. **Save Task List:** Save the generated document in the ‘/tasks/‘ directory with the filename ‘tasks-[prd-file-name].md’, where ‘[prd-file-name]’ matches the base name of the input PRD file (e.g., if the input was ‘prd-user-profile-editing.md’, the output is ‘tasks-prd-user-profile-editing.md’).
+6. **Phase 3: Add Mandatory Integration Tasks:** Always append these three final parent tasks regardless of how many development tasks exist: 1. Integration & routing (connect feature to main app), 2. End-to-end testing (verify complete user journeys), 3. Production readiness (ensure feature is deployable)
+7. **Phase 4: Number Integration Tasks Sequentially** If development tasks are 1.0-3.0, then integrations tasks become 4.0-6.0. If development tasks are 1.0-5.0, then integration tasks become 6.0-8.0
+8. **Identify Relevant Files:** Based on the tasks and PRD, identify potential files that will need to be created or modified. List these under the “Relevant Files” section with a brief description of their purpose in relation to the tasks.
+9. **Generate Final Output:** Combine the parent tasks, sub-tasks, and relevant files into the final Markdown structure.
+10. **Save Task List:** Save the generated document in the ‘/tasks/‘ directory with the filename ‘tasks-[prd-file-name].md’, where ‘[prd-file-name]’ matches the base name of the input PRD file (e.g., if the input was ‘prd-user-profile-editing.md’, the output is ‘tasks-prd-user-profile-editing.md’).
 
 ## Output Format
 
@@ -47,8 +50,58 @@ The generated tasks list _must_ follow this structure:
     - [ ] 2.2 Sub-task description
     - [ ] 2.3 Sub-task description
 - [ ] 3.0 Parent Task Title (may not have sub-tasks if simple enough)
+- [ ] X.0 Final Parent Task Title
+
+## Integration Tasks (Mandatory)
+
+- [X+1].0 Feature Integration & Routing
+- [X+1].1 Add routes to main App router/navigation
+- [X+1].2 Create navigation links or access points from existing UI
+- [X+1].3 Connect to global state (AuthContext, etc.) as needed
+- [X+1].4 Add error boundaries and loading states
+- [X+1].5 Test feature accessibility through app UI (not direct URLs)
+- [X+2].0 End-to-End User Journey Testing
+- [X+2].1 Complete all user stories from PRD end-to-end through actual app
+- [X+2].2 Verify all acceptance criteria through normal user navigation
+- [X+2].3 Test error cases and edge scenarios in integrated environment
+- [X+2].4 Verify mobile responsiveness and basic accessibility
+- [X+3].0 Production Readiness Verification
+- [X+3].1 Ensure npm run build succeeds without errors
+- [X+3].2 Test feature in production build (npm run preview)
+- [X+3].3 Cross-browser compatibility testing (Chrome, Safari)
+- [X+3].4 Performance verification and final quality check
 
 ‘’’
+
+## Daily Git Commands
+
+### Starting a PRD
+- git checkout develop
+- git pull origin develop
+- git checkout -b feature/[prd-name]
+
+### After Each Sub-task Completion
+- git add .
+- git commit -m "[prd-name]: Task [X.X]: [description]"
+
+### Completing a PRD
+**Test before merging (required)**
+- npm run build && npm run preview
+**Merge to develop**
+- git checkout develop
+- git pull origin develop
+- git merge feature/[prd-name]
+- git push origin develop
+- git branch -d feature/[prd-name]
+**Tag if this completes a milestone**
+- git tag v1.x.x && git push origin --tags
+
+## Git Best Practices
+- Never commit directly to main branch
+- Always test before merging
+- Use descriptive commit messages
+- Keep feature branches short-lived
+- Tag releases with semantic versioning when deploying
 
 ## Interaction Model
 
