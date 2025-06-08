@@ -42,7 +42,7 @@
 
 - [ ] 2.0 Authentication Service Integration Testing
     - [x] 2.1 Test authService integration with Supabase - mock Supabase responses
-    - [ ] 2.2 Test user registration flow - successful registration and error scenarios
+    - [x] 2.2 Test user registration flow - successful registration and error scenarios
     - [ ] 2.3 Test user login flow - successful login, invalid credentials, and network errors
     - [ ] 2.4 Test password reset request - email sending and error handling
     - [ ] 2.5 Test password reset confirmation - token validation and password update
