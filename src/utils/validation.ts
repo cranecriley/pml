@@ -40,5 +40,5 @@ export const validatePasswordConfirm = (password: string, confirmPassword: strin
 
 // Generic form validation helper
 export const hasValidationErrors = (errors: Record<string, string | null>): boolean => {
-  return Object.values(errors).some(error => error !== null)
+  return Object.keys(errors).some(key => errors[key] !== null)
 } 
