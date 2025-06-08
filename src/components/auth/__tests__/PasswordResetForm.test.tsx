@@ -343,7 +343,9 @@ describe('PasswordResetForm', () => {
     it('should display "Send Another Reset Email" button', () => {
       expect(screen.getByRole('button', { name: /send another reset email/i })).toBeInTheDocument()
     })
+  })
 
+  describe('Success State with Cancel Button', () => {
     it('should display "Back to Login" button when onCancel is provided', async () => {
       const user = userEvent.setup()
       mockResetPassword.execute.mockResolvedValueOnce({

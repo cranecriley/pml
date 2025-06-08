@@ -45,7 +45,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     const from = urlParams.get('from')
     
     if (from) {
-      return <Navigate to={decodeURIComponent(from)} replace />
+      try {
+        return <Navigate to={decodeURIComponent(from)} replace />
+      } catch (error) {
+        // Handle malformed URLs gracefully by falling back to default redirect
+        console.warn('Malformed redirect URL:', from)
+      }
     }
     
     // Default redirect for authenticated users accessing auth pages
@@ -65,7 +70,7 @@ export const AuthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ ch
 
 // Convenience wrapper for routes that require no authentication (login, register, etc.)
 export const UnauthenticatedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <ProtectedRoute requireUnauth={true}>
+  <ProtectedRoute requireAuth={false} requireUnauth={true}>
     {children}
   </ProtectedRoute>
 )

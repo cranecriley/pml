@@ -35,8 +35,8 @@
     - [x] 1.2 Test LoginForm component - valid input handling, validation errors, loading states
     - [x] 1.3 Test RegisterForm component - validation, password confirmation, email format checking
     - [x] 1.4 Test PasswordResetForm component - email validation and submission handling
-    - [ ] 1.5 Test PasswordResetConfirm component - password validation and confirmation logic
-    - [ ] 1.6 Test ProtectedRoute component - authentication state checking and redirect logic
+    - [x] 1.5 Test PasswordResetConfirm component - password validation and confirmation logic
+    - [x] 1.6 Test ProtectedRoute component - authentication state checking and redirect logic
     - [ ] 1.7 Test AuthLayout component - responsive design and accessibility features
     - [ ] 1.8 Test reusable UI components (ErrorMessage, LoadingSpinner) - props and rendering
 
