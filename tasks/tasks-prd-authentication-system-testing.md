@@ -30,7 +30,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Authentication Component Unit Testing
+- [x] 1.0 Authentication Component Unit Testing
     - [x] 1.1 Set up Jest and React Testing Library for component testing
     - [x] 1.2 Test LoginForm component - valid input handling, validation errors, loading states
     - [x] 1.3 Test RegisterForm component - validation, password confirmation, email format checking
@@ -38,10 +38,10 @@
     - [x] 1.5 Test PasswordResetConfirm component - password validation and confirmation logic
     - [x] 1.6 Test ProtectedRoute component - authentication state checking and redirect logic
     - [x] 1.7 Test AuthLayout component - responsive design and accessibility features
-    - [ ] 1.8 Test reusable UI components (ErrorMessage, LoadingSpinner) - props and rendering
+    - [x] 1.8 Test reusable UI components (ErrorMessage, LoadingSpinner) - props and rendering
 
 - [ ] 2.0 Authentication Service Integration Testing
-    - [ ] 2.1 Test authService integration with Supabase - mock Supabase responses
+    - [x] 2.1 Test authService integration with Supabase - mock Supabase responses
     - [ ] 2.2 Test user registration flow - successful registration and error scenarios
     - [ ] 2.3 Test user login flow - successful login, invalid credentials, and network errors
     - [ ] 2.4 Test password reset request - email sending and error handling
