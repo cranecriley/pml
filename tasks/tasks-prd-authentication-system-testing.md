@@ -34,7 +34,7 @@
     - [x] 1.1 Set up Jest and React Testing Library for component testing
     - [x] 1.2 Test LoginForm component - valid input handling, validation errors, loading states
     - [x] 1.3 Test RegisterForm component - validation, password confirmation, email format checking
-    - [ ] 1.4 Test PasswordResetForm component - email validation and submission handling
+    - [x] 1.4 Test PasswordResetForm component - email validation and submission handling
     - [ ] 1.5 Test PasswordResetConfirm component - password validation and confirmation logic
     - [ ] 1.6 Test ProtectedRoute component - authentication state checking and redirect logic
     - [ ] 1.7 Test AuthLayout component - responsive design and accessibility features

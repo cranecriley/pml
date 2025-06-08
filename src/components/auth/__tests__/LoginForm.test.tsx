@@ -6,7 +6,7 @@ import { LoginForm } from '../LoginForm'
 
 // Mock the child components that the LoginForm uses
 jest.mock('../../feedback/RateLimitWarning', () => ({
-  RateLimitWarning: ({ onRateLimitChange, className }: { onRateLimitChange: (limited: boolean) => void, className: string }) => (
+  RateLimitWarning: ({ onRateLimitChange: _onRateLimitChange, className }: { onRateLimitChange: (limited: boolean) => void, className: string }) => (
     <div data-testid="rate-limit-warning" className={className}>Rate limit warning</div>
   )
 }))
@@ -37,7 +37,7 @@ jest.mock('../../feedback/ActionFeedback', () => ({
 }))
 
 jest.mock('../../feedback/AuthErrorDialog', () => ({
-  LoginErrorDialog: ({ error, isVisible, onClose, userEmail, attemptCount }: any) => 
+  LoginErrorDialog: ({ error: _error, isVisible, onClose, userEmail: _userEmail, attemptCount: _attemptCount }: any) => 
     isVisible ? (
       <div data-testid="error-dialog">
         <h3>Sign In Problem</h3>
