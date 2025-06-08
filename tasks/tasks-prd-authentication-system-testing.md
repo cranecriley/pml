@@ -37,7 +37,7 @@
     - [x] 1.4 Test PasswordResetForm component - email validation and submission handling
     - [x] 1.5 Test PasswordResetConfirm component - password validation and confirmation logic
     - [x] 1.6 Test ProtectedRoute component - authentication state checking and redirect logic
-    - [ ] 1.7 Test AuthLayout component - responsive design and accessibility features
+    - [x] 1.7 Test AuthLayout component - responsive design and accessibility features
     - [ ] 1.8 Test reusable UI components (ErrorMessage, LoadingSpinner) - props and rendering
 
 - [ ] 2.0 Authentication Service Integration Testing
