@@ -34,6 +34,7 @@
 - `src/services/__tests__/passwordResetConfirmationFlow.test.ts` - Integration tests for password reset confirmation flow with 34 test cases covering token validation, password updates, and session management
 - `src/contexts/__tests__/AuthContextStateManagement.test.tsx` - Integration tests for AuthContext state management with 34 test cases covering user state updates, session persistence, inactivity handling, and cleanup operations
 - `src/utils/__tests__/validation.test.ts` - Comprehensive unit tests for validation utilities with 125 test cases covering email format validation, password strength validation, confirmation validation, and edge cases
+- `src/services/__tests__/rateLimitingFlow.test.ts` - Rate limiting functionality tests with 20 test cases covering core requirement verification that 5 failed login attempts trigger rate limiting, progressive delays, time windows, and security features
 
 ## Tasks
 
@@ -58,7 +59,7 @@
     - [x] 2.8 Test validation utilities - email format and password strength validation
 
 - [ ] 3.0 Security & Rate Limiting Verification
-    - [ ] 3.1 Test rate limiting - verify 5 failed login attempts trigger rate limiting
+    - [x] 3.1 Test rate limiting - verify 5 failed login attempts trigger rate limiting
     - [ ] 3.2 Test password requirements - minimum 8 characters enforcement
     - [ ] 3.3 Test email validation - prevent registration with invalid email formats
     - [ ] 3.4 Test duplicate email prevention - verify unique email constraint

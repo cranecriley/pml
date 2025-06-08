@@ -559,7 +559,7 @@ describe('AuthContext State Management Integration Tests', () => {
     it('should handle session refresh', async () => {
       let onSessionRefreshed: (session: any) => void
 
-      mockSessionService.startSessionMonitoring.mockImplementation((expiredCallback: () => void, refreshedCallback: (session: any) => void) => {
+      mockSessionService.startSessionMonitoring.mockImplementation((_expiredCallback: () => void, refreshedCallback: (session: any) => void) => {
         onSessionRefreshed = refreshedCallback
       })
 

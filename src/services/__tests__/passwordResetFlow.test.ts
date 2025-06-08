@@ -406,6 +406,7 @@ describe('Password Reset Flow Integration Tests', () => {
         })
 
         const result = await authService.resetPassword(email)
+        expect(result).toBe(mockResponse)
         expect(mockSupabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
           email,
           expect.any(Object)
