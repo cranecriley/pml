@@ -40,6 +40,7 @@
 - `src/services/__tests__/duplicateEmailPrevention.test.ts` - Comprehensive duplicate email prevention tests with 17 test cases covering unique email constraint enforcement, concurrent registration handling, error message consistency, and security considerations
 - `src/services/__tests__/passwordResetExpiration.test.ts` - Comprehensive password reset link expiration tests with 21 test cases covering 1-hour timeout verification, expired token detection, session validation, time-based simulation, error guidance, and security considerations
 - `src/services/__tests__/sessionSecurity.test.ts` - Comprehensive session security and secure token handling tests with 29 test cases covering session token validation, secure restoration, token refresh security, session monitoring, timing attack prevention, session cleanup, and integration testing
+- `src/services/__tests__/httpsRequirements.test.ts` - Comprehensive HTTPS requirements and secure connection enforcement tests with 33 test cases covering HTTPS protocol enforcement, SSL/TLS certificate validation, mixed content prevention, security headers validation, network security validation, browser security integration, HTTPS configuration validation, and error handling for HTTPS violations
 
 ## Tasks
 
@@ -70,6 +71,7 @@
     - [x] 3.4 Test duplicate email prevention - verify unique email constraint
     - [x] 3.5 Test password reset link expiration - verify 1-hour timeout
     - [x] 3.6 Test session security - verify secure token handling
+    - [x] 3.7 Test HTTPS requirements - ensure all auth requests use secure connections
 
 - [ ] 4.0 Email Flow End-to-End Testing
     - [ ] 4.1 Set up email testing environment (use Supabase test environment)
