@@ -27,6 +27,10 @@
 - `cypress.config.js` - Cypress configuration for e2e testing
 - `src/test-setup.ts` - Jest test setup file with React Testing Library configuration and global mocks
 - `src/components/auth/__tests__/setup.test.ts` - Basic test to verify Jest and React Testing Library setup
+- `src/services/__tests__/authService.test.ts` - Comprehensive unit tests for authService with 40 test cases
+- `src/services/__tests__/registrationFlow.test.ts` - Integration tests for user registration flow with 21 test cases
+- `src/services/__tests__/loginFlow.test.ts` - Integration tests for user login flow with 29 test cases covering successful login, invalid credentials, and network errors
+- `src/services/__tests__/passwordResetFlow.test.ts` - Integration tests for password reset flow with 31 test cases covering email sending scenarios, error handling, and password update process
 
 ## Tasks
 
@@ -43,8 +47,8 @@
 - [ ] 2.0 Authentication Service Integration Testing
     - [x] 2.1 Test authService integration with Supabase - mock Supabase responses
     - [x] 2.2 Test user registration flow - successful registration and error scenarios
-    - [ ] 2.3 Test user login flow - successful login, invalid credentials, and network errors
-    - [ ] 2.4 Test password reset request - email sending and error handling
+    - [x] 2.3 Test user login flow - successful login, invalid credentials, and network errors
+    - [x] 2.4 Test password reset request - email sending and error handling
     - [ ] 2.5 Test password reset confirmation - token validation and password update
     - [ ] 2.6 Test AuthContext state management - user state updates and persistence
     - [ ] 2.7 Test useAuth hook - all authentication methods and error states
