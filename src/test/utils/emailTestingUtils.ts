@@ -145,7 +145,7 @@ export class EmailTestingUtils {
     
     try {
       // Register user with email verification
-      const { data, error } = await this.getTestClient().auth.signUp({
+      const { data: _data, error } = await this.getTestClient().auth.signUp({
         email,
         password,
         options: {
@@ -190,7 +190,7 @@ export class EmailTestingUtils {
     const startTime = Date.now()
     
     try {
-      const { data, error } = await this.getTestClient().auth.resetPasswordForEmail(email, {
+      const { data: _data, error } = await this.getTestClient().auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`
       })
       

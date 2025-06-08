@@ -38,8 +38,7 @@ global.window = {
 import { 
   emailTestingUtils, 
   createEmailVerificationTest,
-  EMAIL_TEMPLATES,
-  EMAIL_TEST_CONFIG
+  EMAIL_TEMPLATES
 } from '../utils/emailTestingUtils'
 import { authService } from '../../services/authService'
 

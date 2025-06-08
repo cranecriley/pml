@@ -33,7 +33,6 @@ const originalFetch = global.fetch
 const mockFetch = jest.fn()
 
 import { authService } from '../authService'
-import { passwordResetService } from '../passwordResetService'
 import { sessionService } from '../sessionService'
 import type { RegisterCredentials, LoginCredentials } from '../../types/auth'
 
