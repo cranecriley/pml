@@ -92,7 +92,7 @@
     - [x] 4.8 Test invalid email tokens - verify proper error handling for tampered links
 
 - [ ] 5.0 Session Management & Timeout Testing
-    - [ ] 5.1 Test automatic session restoration - verify users stay logged in on app reload
+    - [x] 5.1 Test automatic session restoration - verify users stay logged in on app reload
     - [ ] 5.2 Test 24-hour inactivity timeout - verify automatic logout after timeout
     - [ ] 5.3 Test session refresh mechanism - verify tokens refresh before expiration
     - [ ] 5.4 Test logout functionality - verify complete session cleanup
