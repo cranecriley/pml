@@ -49,6 +49,8 @@
 - `src/test/__tests__/passwordResetFlowE2E.test.ts` - Comprehensive end-to-end tests for complete password reset flow with 18 test cases covering request → email → reset → login journey, expired tokens, session management, error scenarios, template validation, security requirements, performance testing, authentication integration, and statistics tracking
 - `src/test/__tests__/emailTemplateRenderingE2E.test.ts` - Comprehensive end-to-end tests for email template rendering and professional appearance with 16 test cases covering professional styling, brand consistency, visual design, email client compatibility, responsiveness, accessibility, user experience, security indicators, trust messaging, and performance optimization
 - `src/test/__tests__/emailDeliveryReliabilityE2E.test.ts` - Comprehensive end-to-end tests for email delivery reliability and inbox delivery optimization with 21 test cases covering inbox delivery verification, spam filter avoidance, sender reputation indicators, email authentication and security, delivery timing and performance, deliverability optimization, email service provider compatibility (Gmail, Outlook, mobile), reputation building, and trust indicators
+- `src/test/__tests__/sessionRestorationE2E.test.ts` - Comprehensive end-to-end tests for automatic session restoration with 21 test cases covering valid session restoration on app reload, browser refresh handling, automatic session refresh for expiring sessions, failed restoration scenarios, session validation timing, error handling, performance testing, and integration verification
+- `src/test/__tests__/inactivityTimeoutE2E.test.ts` - Comprehensive end-to-end tests for 24-hour inactivity timeout with 23 test cases covering timeout functionality, activity detection and reset, warning system, service lifecycle management, configuration and status, edge cases and error handling, warning and timeout workflow, and time format and display features
 
 ## Tasks
 
@@ -93,7 +95,7 @@
 
 - [ ] 5.0 Session Management & Timeout Testing
     - [x] 5.1 Test automatic session restoration - verify users stay logged in on app reload
-    - [ ] 5.2 Test 24-hour inactivity timeout - verify automatic logout after timeout
+    - [x] 5.2 Test 24-hour inactivity timeout - verify automatic logout after timeout
     - [ ] 5.3 Test session refresh mechanism - verify tokens refresh before expiration
     - [ ] 5.4 Test logout functionality - verify complete session cleanup
     - [ ] 5.5 Test concurrent session handling - verify behavior with multiple browser tabs
