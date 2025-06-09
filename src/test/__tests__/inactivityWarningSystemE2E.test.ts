@@ -1,4 +1,4 @@
-import type { Session, User } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { InactivityService } from '../../services/inactivityService'
 
 // Mock Supabase
@@ -193,7 +193,7 @@ describe('Inactivity Warning System End-to-End Tests', () => {
       ]
       
       testCases.forEach(({ minutesLeft, expectedTime }) => {
-        // Create fresh service for each test
+        // Create fresh service for each test - testing ${minutesLeft} minutes scenario
         const testService = new InactivityService({
           timeoutMs: DAY_MS,
           warningMs: WARNING_MS,
@@ -208,7 +208,7 @@ describe('Inactivity Warning System End-to-End Tests', () => {
         
         testService.start(testCallbacks)
         
-        // Set time to specific point
+        // Set time to specific point for ${minutesLeft} minutes test
         const startTime = mockDateNow()
         mockDateNow.mockReturnValue(startTime + DAY_MS - expectedTime)
         

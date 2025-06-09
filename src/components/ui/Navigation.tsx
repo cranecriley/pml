@@ -8,7 +8,7 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
-  const { user, loading } = useAuth()
+  const { user, loading, postLoginRouting } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -125,7 +125,12 @@ export const Navigation: React.FC<NavigationProps> = ({ className = '' }) => {
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     <div className="py-1">
                       <div className="px-4 py-2 text-sm text-gray-500 border-b">
-                        {user.email}
+                        <div>{user.email}</div>
+                        {postLoginRouting && (
+                          <div className="text-xs text-blue-600 mt-1">
+                            {postLoginRouting.isNewUser ? '🎉 New User' : '👋 Welcome Back'}
+                          </div>
+                        )}
                       </div>
                       <Link
                         to="/dashboard"

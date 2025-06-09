@@ -7,7 +7,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ className = '' }) => {
-  const { user } = useAuth()
+  const { user, loading, postLoginRouting } = useAuth()
   const location = useLocation()
 
   // Don't show footer on auth pages to keep them clean
@@ -17,7 +17,8 @@ export const Footer: React.FC<FooterProps> = ({ className = '' }) => {
   // Don't show footer on test page
   const isTestPage = location.pathname === '/test'
   
-  if (isAuthPage || isTestPage) {
+  // Don't show footer while loading to prevent layout shift
+  if (isAuthPage || isTestPage || loading) {
     return null
   }
 

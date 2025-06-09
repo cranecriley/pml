@@ -87,16 +87,7 @@ describe('Concurrent Session Handling End-to-End Tests', () => {
     expires_at: Math.floor(Date.now() / 1000) - 300 // Expired 5 minutes ago
   }
 
-  // Helper to simulate storage events across tabs
-  const simulateStorageEvent = (key: string, newValue: string | null, oldValue: string | null = null) => {
-    const event = new StorageEvent('storage', {
-      key,
-      newValue,
-      oldValue,
-      storageArea: localStorage
-    })
-    window.dispatchEvent(event)
-  }
+  // Helper function removed as it was unused
 
   beforeEach(() => {
     jest.clearAllMocks()
