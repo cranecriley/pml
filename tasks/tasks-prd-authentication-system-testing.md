@@ -81,15 +81,15 @@
     - [x] 3.6 Test session security - verify secure token handling
     - [x] 3.7 Test HTTPS requirements - ensure all auth requests use secure connections
 
-- [ ] 4.0 Email Flow End-to-End Testing
+- [x] 4.0 Email Flow End-to-End Testing
     - [x] 4.1 Set up email testing environment (use Supabase test environment)
     - [x] 4.2 Test email verification flow - registration → email → verification → login
     - [x] 4.3 Test password reset email flow - request → email → reset → login
     - [x] 4.4 Test email template rendering - verify professional appearance and branding
     - [x] 4.5 Test email delivery reliability - verify emails reach inbox (not spam)
-    - [ ] 4.6 Test email link expiration - verify expired links show appropriate errors
-    - [ ] 4.7 Test email resend functionality - verify users can request new verification emails
-    - [ ] 4.8 Test invalid email tokens - verify proper error handling for tampered links
+    - [x] 4.6 Test email link expiration - verify expired links show appropriate errors
+    - [x] 4.7 Test email resend functionality - verify users can request new verification emails
+    - [x] 4.8 Test invalid email tokens - verify proper error handling for tampered links
 
 - [ ] 5.0 Session Management & Timeout Testing
     - [ ] 5.1 Test automatic session restoration - verify users stay logged in on app reload
