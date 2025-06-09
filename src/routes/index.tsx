@@ -48,52 +48,16 @@ const DashboardPage = () => {
   const { user } = useAuth()
   
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header with logout */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              {user?.email && (
-                <p className="text-gray-600 mt-1">Welcome back, {user.email.split('@')[0]}!</p>
-              )}
-            </div>
-            
-            {/* User menu with logout */}
-            <div className="flex items-center space-x-4">
-              <div className="hidden sm:flex items-center space-x-4">
-                <span className="text-sm text-gray-600">
-                  {user?.email}
-                </span>
-                <LogoutButton
-                  variant="secondary"
-                  size="sm"
-                  showConfirmation={true}
-                />
-              </div>
-              
-              {/* Mobile menu */}
-              <div className="sm:hidden">
-                <LogoutButton
-                  variant="ghost"
-                  size="sm"
-                  showConfirmation={true}
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                </LogoutButton>
-              </div>
-            </div>
+    <div className="py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white rounded-lg shadow p-6">
+          {/* Dashboard Header */}
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+            {user?.email && (
+              <p className="text-gray-600">Welcome back, {user.email.split('@')[0]}!</p>
+            )}
           </div>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow p-6">
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Language Learning Dashboard</h2>
               <p className="text-gray-600">Welcome to your personalized language learning experience!</p>
@@ -171,8 +135,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
   )
 }
 
@@ -208,31 +171,7 @@ const WelcomePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Header with logout option */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-              </div>
-              <span className="text-lg font-semibold text-gray-900">Welcome Setup</span>
-            </div>
-            
-            <LogoutButton
-              variant="ghost"
-              size="sm"
-              showConfirmation={true}
-              className="text-gray-600 hover:text-gray-800"
-            />
-          </div>
-        </div>
-      </header>
-
-      <div className="py-8">
+    <div className="py-8 bg-gradient-to-b from-blue-50 to-white min-h-screen">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-lg p-8">
             {/* Welcome Header */}
@@ -345,7 +284,6 @@ const WelcomePage = () => {
             )}
           </div>
         </div>
-      </div>
     </div>
   )
 }
