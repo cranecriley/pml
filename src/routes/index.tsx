@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { PasswordResetPage } from '../pages/PasswordResetPage'
@@ -116,22 +116,57 @@ const DashboardPage = () => {
               </button>
             </div>
 
-            {/* Quick logout option in content */}
+            {/* Quick account management and access points */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 mb-4">
                 Account Management
               </p>
-              <div className="flex flex-wrap gap-3">
-                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium p-2 rounded hover:bg-blue-50 transition-colors">
                   Settings
                 </button>
-                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                <button className="text-sm text-blue-600 hover:text-blue-800 font-medium p-2 rounded hover:bg-blue-50 transition-colors">
                   Profile
                 </button>
-                <LogoutLink className="text-sm text-gray-600 hover:text-gray-800 font-medium">
+                <Link
+                  to="/reset-password"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium p-2 rounded hover:bg-blue-50 transition-colors text-center"
+                >
+                  Change Password
+                </Link>
+                <LogoutLink className="text-sm text-gray-600 hover:text-gray-800 font-medium p-2 rounded hover:bg-gray-50 transition-colors text-center">
                   Sign Out
                 </LogoutLink>
               </div>
+              
+              {/* Quick access to authentication testing in development */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="text-xs text-orange-600 mb-2 font-medium">
+                    Development Tools
+                  </p>
+                  <div className="flex gap-3">
+                    <Link
+                      to="/test"
+                      className="text-xs text-orange-600 hover:text-orange-800 font-medium p-2 rounded hover:bg-orange-50 transition-colors"
+                    >
+                      🧪 Authentication Test Suite
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="text-xs text-orange-600 hover:text-orange-800 font-medium p-2 rounded hover:bg-orange-50 transition-colors"
+                    >
+                      📝 Test Registration
+                    </Link>
+                    <Link
+                      to="/login"
+                      className="text-xs text-orange-600 hover:text-orange-800 font-medium p-2 rounded hover:bg-orange-50 transition-colors"
+                    >
+                      🔑 Test Login
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
