@@ -113,7 +113,7 @@
 
 - [ ] 6.0 Feature Integration & Routing
     - [x] 6.1 Add routes to main App router/navigation
-    - [ ] 6.2 Create navigation links or access points from existing UI
+    - [x] 6.2 Create navigation links or access points from existing UI
     - [ ] 6.3 Connect to global state (AuthContext, etc.) as needed
     - [ ] 6.4 Add error boundaries and loading states
     - [ ] 6.5 Test feature accessibility through app UI (not direct URLs)
