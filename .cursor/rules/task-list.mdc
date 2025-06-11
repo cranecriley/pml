@@ -1,6 +1,7 @@
 ---
 description: Manages task list execution with strict one-sub-task-at-a-time workflow. Requires user permission before starting each sub-task, maintains completion protocol, and keeps files updated.
 globs: /tasks/tasks-*.md, **/*.ts, **/*.tsx, **/*.js, **/*.jsx
+alwaysApply: false
 ---
 # Task List Management
 
@@ -14,6 +15,28 @@ Guidelines for managing task lists in markdown files to track progress on comple
     - If **all** subtasks underneath a parent task are now ‘[x]’, also mark the **parent task** as completed
 - Stop after each sub-task and wait for the user’s go-ahead
 
+
+## User Testing Requirements
+
+### Manual User Journey Tasks ([X+2].0)
+**AI cannot mark these tasks complete without user interaction:**
+
+#### For Task [X+2].1 - AI provides scenarios:
+**Test Scenario Format:**
+- **Steps**: 1. Navigate to... 2. Click... 3. Fill in...
+- **Expected Result**: User should see...
+- **Pass Criteria**: Feature works without errors
+- **Report Format**: "✅ Worked as expected" or "❌ Issue: [description]"
+
+#### For Task [X+2].2 - User executes and reports:
+- User must actually perform each scenario
+- User provides written feedback on results
+- No task marked complete until user confirms execution
+
+#### For Tasks [X+2].3-[X+2].4 - Issue resolution:
+- Fix issues based on user feedback
+- User re-tests fixes and confirms resolution
+
 ## Task List Maintenance
 
 1. **Update the task list as your work:**
@@ -23,6 +46,42 @@ Guidelines for managing task lists in markdown files to track progress on comple
 2. **Maintain the “Relevant Files” section:**
     1. List every file created or modified
     2. Give each file a one-line description of its purpose
+
+## Performance Monitoring
+
+### Development Health Checks
+**Monitor during development and alert if exceeded:**
+- **Build time >30 seconds**: Pause and identify bloat
+- **HMR >2 seconds**: Review recent changes for performance impact
+- **>20 files created**: Consider consolidation opportunities
+- **>3 new dependencies**: Justify each addition
+
+### Cleanup Triggers
+**When limits exceeded:**
+1. **Stop current development**
+2. **Create cleanup sub-task**
+3. **Address performance issue**
+4. **Continue only after metrics return to acceptable range**
+
+## Bloat Reduction Protocol
+
+### Existing Bloat Cleanup
+**Before starting any new PRD, audit for:**
+- **Unused files**: `find src/ -name "*.tsx" | xargs grep -L "export"` 
+- **Duplicate components**: Multiple files doing same thing
+- **Over-abstracted patterns**: Complex code that could be simpler
+- **Unnecessary dependencies**: `npm list --depth=0` and question each package
+
+### Cleanup Process
+1. **File audit**: List all files, identify unused/duplicate
+2. **Dependency audit**: Remove packages not actively used
+3. **Pattern consolidation**: Merge similar components
+4. **Performance test**: Verify cleanup improves build/HMR times
+
+### Cleanup Triggers
+- **Before new PRD**: Always audit and clean
+- **Performance degradation**: When targets exceeded
+- **Bug complexity**: When simple fixes become hard
 
 ## AI Instructions
 
@@ -36,3 +95,11 @@ When working with task lists, the AI must:
     4. Keep “Relevant Files” accurate and up-to-date
     5. Before starting work, check which sub-task is next
     6. After implementing a sub-task, update the file and then pause for user approval
+3. **Manual Testing Validation**: 
+    1. Never mark manual user journey tasks ([X+2].1-[X+2].4) complete without user execution
+    2. Provide specific, actionable test scenarios with clear pass/fail criteria
+    3. Wait for user written confirmation before proceeding
+4. **Performance Awareness**:
+    1. Monitor file count and dependency additions
+    2. Alert user if performance targets are exceeded
+    3. Suggest cleanup before continuing development

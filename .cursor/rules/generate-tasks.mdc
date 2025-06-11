@@ -28,6 +28,32 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 9. **Generate Final Output:** Combine the parent tasks, sub-tasks, and relevant files into the final Markdown structure.
 10. **Save Task List:** Save the generated document in the ‘/tasks/‘ directory with the filename ‘tasks-[prd-file-name].md’, where ‘[prd-file-name]’ matches the base name of the input PRD file (e.g., if the input was ‘prd-user-profile-editing.md’, the output is ‘tasks-prd-user-profile-editing.md’).
 
+## Testing Strategy Integration
+
+### Right-Sized Testing Approach
+- **P0 Critical**: Happy path user journeys, security essentials, data integrity
+- **P1 Important**: Key edge cases, integration points between components
+- **P2 Skip**: Exhaustive edge cases, duplicate functionality tests
+- **Test Budget**: Maximum 25 tests per feature (focus on P0 and P1 only)
+
+### Manual-First Testing Philosophy
+- **Primary method**: Manual user testing through actual app interface
+- **Secondary method**: Automated tests only for critical business logic
+- **Focus**: Real user experience over code coverage metrics
+
+## Performance Guidelines
+
+### Development Performance Targets
+- **HMR (Hot Module Reload)**: Maximum 2 seconds for changes to appear
+- **Build time**: Maximum 30 seconds for `npm run build`
+- **Dev server startup**: Maximum 15 seconds for `npm run dev`
+
+### Bloat Prevention
+- **Utility files**: Maximum 3 per feature
+- **Component patterns**: Reuse existing patterns before creating new ones
+- **Dependencies**: Must justify each new package addition
+- **File count**: Alert if feature creates >20 new files
+
 ## Output Format
 
 The generated tasks list _must_ follow this structure:
@@ -52,24 +78,24 @@ The generated tasks list _must_ follow this structure:
 - [ ] 3.0 Parent Task Title (may not have sub-tasks if simple enough)
 - [ ] X.0 Final Parent Task Title
 
-## Integration Tasks (Mandatory)
+### Integration Tasks (Mandatory)
+- [ ] [X+1].0 Feature Integration & Routing
+    - [ ] [X+1].1 Add routes to main App router/navigation
+    - [ ] [X+1].2 Create navigation links or access points from existing UI
+    - [ ] [X+1].3 Connect to global state (AuthContext, etc.) as needed
+    - [ ] [X+1].4 Add error boundaries and loading states
 
-- [X+1].0 Feature Integration & Routing
-- [X+1].1 Add routes to main App router/navigation
-- [X+1].2 Create navigation links or access points from existing UI
-- [X+1].3 Connect to global state (AuthContext, etc.) as needed
-- [X+1].4 Add error boundaries and loading states
-- [X+1].5 Test feature accessibility through app UI (not direct URLs)
-- [X+2].0 End-to-End User Journey Testing
-- [X+2].1 Complete all user stories from PRD end-to-end through actual app
-- [X+2].2 Verify all acceptance criteria through normal user navigation
-- [X+2].3 Test error cases and edge scenarios in integrated environment
-- [X+2].4 Verify mobile responsiveness and basic accessibility
-- [X+3].0 Production Readiness Verification
-- [X+3].1 Ensure npm run build succeeds without errors
-- [X+3].2 Test feature in production build (npm run preview)
-- [X+3].3 Cross-browser compatibility testing (Chrome, Safari)
-- [X+3].4 Performance verification and final quality check
+- [ ] [X+2].0 Manual User Journey Testing (Human Required)
+    - [ ] [X+2].1 AI provides specific test scenarios for user to execute
+    - [ ] [X+2].2 User manually tests all scenarios and reports results
+    - [ ] [X+2].3 Fix any issues found during user testing
+    - [ ] [X+2].4 User confirms all fixes work as expected
+
+- [ ] [X+3].0 Production Readiness Verification
+    - [ ] [X+3].1 Ensure npm run build succeeds in <30 seconds
+    - [ ] [X+3].2 Test feature in production build (npm run preview)
+    - [ ] [X+3].3 Performance check: HMR <2 seconds, no console errors
+    - [ ] [X+3].4 Final user sign-off that feature is ready
 
 ‘’’
 
