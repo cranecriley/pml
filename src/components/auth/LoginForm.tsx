@@ -4,9 +4,6 @@ import { useAuth } from '../../hooks/useAuth'
 import { validateEmail, validatePassword } from '../../utils/validation'
 import { ErrorMessage } from '../ui/ErrorMessage'
 import { LoadingButton } from '../ui/LoadingButton'
-import { RateLimitWarning } from '../feedback/RateLimitWarning'
-import { AuthProgressIndicator } from '../feedback/ProgressIndicator'
-import { LoginFeedback, type ActionState } from '../feedback/ActionFeedback'
 import { LoginErrorDialog } from '../feedback/AuthErrorDialog'
 import { LoginSuccessMessage } from '../feedback/SuccessMessage'
 
@@ -29,8 +26,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
     password?: string
   }>({})
   const [isRateLimited, setIsRateLimited] = useState(false)
-  const [loginStep, setLoginStep] = useState<'credentials' | 'verification' | 'processing' | 'complete' | 'error'>('credentials')
-  const [feedbackState, setFeedbackState] = useState<ActionState>('idle')
 
   const { login, user } = useAuth()
 
@@ -50,8 +45,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
   const handleError = (err: any) => {
     console.error('Login error:', err)
     
-    setLoginStep('error')
-    setFeedbackState('error')
     setLastError(err)
     setAttemptCount(prev => prev + 1)
     
@@ -93,35 +86,20 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
     e.preventDefault()
     setError('')
     setValidationErrors({})
-    setFeedbackState('idle')
     setShowErrorDialog(false)
     setShowSuccessMessage(false)
 
     if (isRateLimited) {
       setError('Please wait before attempting to login again.')
-      setFeedbackState('warning')
       return
     }
 
     if (!validateForm()) {
-      setFeedbackState('warning')
       return
     }
     
     try {
-      // Start login process
-      setLoginStep('verification')
-      setFeedbackState('loading')
-      
-      // Add small delay to show verification step
-      await new Promise(resolve => setTimeout(resolve, 500))
-      setLoginStep('processing')
-      
       await login.execute({ email, password })
-      
-      // Success state
-      setLoginStep('complete')
-      setFeedbackState('success')
       
       // Handle success with message
       handleSuccess()
@@ -137,9 +115,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
       onSuccess()
     }
   }
-
-  // Determine if we should show progress indicator
-  const showProgress = feedbackState === 'loading' || loginStep !== 'credentials'
 
   // If showing success message, render it
   if (showSuccessMessage) {
@@ -158,44 +133,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
   return (
     <>
       <div className={`space-y-6 ${className}`}>
-        <div>
-          <h2 className="text-3xl font-bold text-gray-900 text-center">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account to continue
-          </p>
-        </div>
-
-        {/* Progress Indicator */}
-        {showProgress && (
-          <AuthProgressIndicator 
-            currentStep={loginStep}
-            variant="minimal"
-            className="mb-4"
-          />
-        )}
-
-        {/* Rate Limiting Warning */}
-        {email && (
-          <RateLimitWarning 
-            email={email}
-            onRateLimitChange={setIsRateLimited}
-            className="mb-4"
-          />
-        )}
-
-        {/* Enhanced Action Feedback */}
-        <LoginFeedback 
-          state={feedbackState}
-          className="mb-4"
-        />
-
-        {/* Legacy Error Display (for simple errors) */}
-        {error && feedbackState === 'idle' && !showErrorDialog && (
-          <ErrorMessage message={error} />
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">
@@ -261,20 +198,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, className = '' 
           <div>
             <LoadingButton
               type="submit"
-              isLoading={login.loading}
-              disabled={isRateLimited || loginStep === 'complete'}
+              disabled={isRateLimited}
               variant="primary"
               size="md"
               className="w-full transition-all duration-200"
-              loadingText={
-                loginStep === 'verification' ? 'Verifying...' :
-                loginStep === 'processing' ? 'Processing...' :
-                'Signing In...'
-              }
             >
-              {isRateLimited ? 'Please Wait...' : 
-               loginStep === 'complete' ? 'Success!' : 
-               'Sign In'}
+              {isRateLimited ? 'Please Wait...' : 'Sign In'}
             </LoadingButton>
           </div>
 

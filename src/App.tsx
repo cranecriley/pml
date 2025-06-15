@@ -7,7 +7,6 @@ import { Navigation } from './components/ui/Navigation'
 import { Footer } from './components/ui/Footer'
 import ErrorBoundary from './components/ErrorBoundary'
 import GlobalLoadingState from './components/ui/GlobalLoadingState'
-import AuthStatusIndicator from './components/ui/AuthStatusIndicator'
 import { Routes, Route } from 'react-router-dom'
 
 function App() {
@@ -32,9 +31,6 @@ function App() {
                   <Footer />
                 </ErrorBoundary>
               </div>
-              
-              {/* Development auth status indicator */}
-              <AuthStatusIndicator position="bottom-left" />
             </GlobalLoadingState>
           </AuthWrapper>
         </Router>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { LoginForm } from '../components/auth/LoginForm'
 import { AuthLayout } from '../components/auth/AuthLayout'
 import { useAuth } from '../hooks/useAuth'
@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, loading, login, postLoginRouting, getPostLoginPath } = useAuth()
+  const { user, loading, postLoginRouting, getPostLoginPath } = useAuth()
 
   // Get the intended destination from location state or use post-login routing
   const getDestination = () => {
@@ -26,11 +26,6 @@ export const LoginPage: React.FC = () => {
       navigate(destination, { replace: true })
     }
   }, [user, loading, navigate, postLoginRouting])
-
-  const handleLogin = async (email: string, password: string) => {
-    await login.execute({ email, password })
-    // Navigation will be handled by the useEffect above when user state updates
-  }
 
   // Show loading while checking authentication
   if (loading) {
@@ -53,40 +48,11 @@ export const LoginPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Welcome back"
+      title="Pardon my Language"
       subtitle="Sign in to your account to continue"
     >
       <div className="space-y-6">
-        <LoginForm
-          onSubmit={handleLogin}
-          isLoading={login.loading}
-          error={login.error || undefined}
-        />
-
-        {/* Navigation Links */}
-        <div className="space-y-4 text-center">
-          {/* Register Link */}
-          <div className="text-sm">
-            <span className="text-gray-600">Don't have an account? </span>
-            <Link
-              to="/register"
-              state={{ from: location.state?.from }}
-              className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
-            >
-              Create one here
-            </Link>
-          </div>
-
-          {/* Password Reset Link */}
-          <div className="text-sm">
-            <Link
-              to="/reset-password"
-              className="text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-        </div>
+        <LoginForm />
 
         {/* Redirect Info */}
         {location.state?.from && (
@@ -119,16 +85,6 @@ export const LoginPage: React.FC = () => {
                   Welcome back! You'll be taken to your dashboard.
                 </>
               )}
-            </p>
-          </div>
-        )}
-
-        {/* Demo Info (for development) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-center">
-            <p className="text-xs text-gray-600 font-medium mb-1">Development Mode</p>
-            <p className="text-xs text-gray-500">
-              Use any valid email format and a password with at least 8 characters.
             </p>
           </div>
         )}
